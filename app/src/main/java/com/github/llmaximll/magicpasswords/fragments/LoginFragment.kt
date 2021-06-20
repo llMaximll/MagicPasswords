@@ -36,6 +36,7 @@ class LoginFragment : Fragment() {
     private var firstLaunch = false
     private var secondPassword = ""
     private var password = ""
+    private var fingerprint: Boolean? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -46,6 +47,7 @@ class LoginFragment : Fragment() {
         super.onCreate(savedInstanceState)
         cf = CommonFunctions.get()
         sp = cf.getSharedPreferences(requireContext())
+        fingerprint = sp.getBoolean(cf.spFingerPrint, false)
         //arguments
         firstLaunch = arguments?.getBoolean(ARG_FIRST_LAUNCH, false) ?: false
         secondPassword = arguments?.getString(ARG_SECOND_PASSWORD, "") ?: ""
@@ -71,6 +73,10 @@ class LoginFragment : Fragment() {
             firstLaunch()
         } else {
             binding.infoTextView.text = "Введите пароль"
+        }
+        if (fingerprint == false) {
+            binding.fingerprintButton.visibility = View.GONE
+            binding.backButton.visibility = View.VISIBLE
         }
     }
 
@@ -171,9 +177,7 @@ class LoginFragment : Fragment() {
                         editor.putBoolean(cf.spFirstLaunch, true)
                         editor.putString(cf.spPassword, password)
                         editor.apply()
-                        cf.toast(requireContext(), "Пароли совпадают | " +
-                                "${sp.getBoolean(cf.spFirstLaunch, false)}, " +
-                                "${sp.getString(cf.spPassword, "")}")
+                        callbacks?.onLoginFragment(null)
                     } else {
                         cf.toast(requireContext(), "Пароли не совпадают")
                     }
@@ -317,8 +321,10 @@ class LoginFragment : Fragment() {
             binding.fingerprintButton.visibility = View.GONE
             binding.backButton.visibility = View.VISIBLE
         } else {
-            binding.fingerprintButton.visibility = View.VISIBLE
-            binding.backButton.visibility = View.GONE
+            if (fingerprint == true) {
+                binding.fingerprintButton.visibility = View.VISIBLE
+                binding.backButton.visibility = View.GONE
+            }
         }
     }
 

@@ -2,9 +2,13 @@ package com.github.llmaximll.magicpasswords.vm
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.os.Build
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.EditText
+import androidx.annotation.RequiresApi
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.lifecycle.ViewModel
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
@@ -80,5 +84,12 @@ class SettingsVM : ViewModel() {
         }
 
         return true
+    }
+
+    fun checkFingerprintCompatibility(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return context.packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)
+        }
+        return false
     }
 }
