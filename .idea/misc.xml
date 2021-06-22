@@ -3,10 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/background_dialog.xml" value="0.1115" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/circle_password.xml" value="0.1115" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/circle_password_off.xml" value="0.1115" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/circle_password_on.xml" value="0.1115" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/ic_add.xml" value="0.1115" />
+        <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/ic_delete.xml" value="0.1115" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/ic_fingerprint.xml" value="0.1115" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/ic_settings.xml" value="0.1115" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/item_rv_passwords_list.xml" value="0.1115" />
@@ -14,6 +16,7 @@
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/activity_login.xml" value="0.1638888888888889" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/df_add_password.xml" value="0.1638888888888889" />
+        <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/dialog_bio_login.xml" value="0.1638888888888889" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_change_password.xml" value="0.1638888888888889" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_login.xml" value="0.1638888888888889" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_passwords_list.xml" value="0.1638888888888889" />
@@ -29,5 +32,8 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="SuppressKotlinCodeStyleNotification">
+    <option name="disableForAll" value="true" />
   </component>
 </project>

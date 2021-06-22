@@ -4,6 +4,8 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -54,7 +56,7 @@ class LoginFragment : Fragment() {
         cf.log(TAG, "arguments | firstLaunch=$firstLaunch")
         //auth
         if (sp.getBoolean(cf.spFingerPrint, false)) {
-            showFingerprint()
+            showFingerprint(false)
         }
     }
 
@@ -91,7 +93,7 @@ class LoginFragment : Fragment() {
         callbacks = null
     }
 
-    private fun showFingerprint() {
+    private fun showFingerprint(mode: Boolean) {
         lifecycleScope.launch(Dispatchers.Main) {
             biometricPrompt = BiometricPrompt(this@LoginFragment,
                 object : BiometricPrompt.AuthenticationCallback() {
@@ -99,24 +101,64 @@ class LoginFragment : Fragment() {
                         result: BiometricPrompt.AuthenticationResult) {
                         super.onAuthenticationSucceeded(result)
 
-                        setColorCircles(1)
-                        setColorCircles(2)
-                        setColorCircles(3)
-                        setColorCircles(4)
-                        callbacks?.onLoginFragment(null)
-                        cf.toast(requireContext(), "Верный пароль")
+                        if (!mode) {
+                            setColorCircles(1)
+                            setColorCircles(2)
+                            setColorCircles(3)
+                            setColorCircles(4)
+                            callbacks?.onLoginFragment(null)
+                            cf.toast(requireContext(), "Верный пароль")
+                        } else {
+                            val editor = sp.edit()
+                            editor.putBoolean(cf.spFingerPrint, true)
+                            editor.putBoolean(cf.spFirstLaunch, true)
+                            editor.putString(cf.spPassword, password)
+                            editor.apply()
+                            callbacks?.onLoginFragment(null)
+                            cf.toast(requireContext(), "Настройки сохранены")
+                        }
                     }
 
                     override fun onAuthenticationFailed() {
                         super.onAuthenticationFailed()
-                        cf.toast(requireContext(), "Вход не удался")
+                        if (!mode) {
+                            cf.toast(requireContext(), "Вход не удался")
+                        } else {
+                            val editor = sp.edit()
+                            editor.putBoolean(cf.spFirstLaunch, true)
+                            editor.putString(cf.spPassword, password)
+                            editor.apply()
+                            callbacks?.onLoginFragment(null)
+                            cf.toast(requireContext(), "Настройки сохранены")
+                        }
+                    }
+
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                        super.onAuthenticationError(errorCode, errString)
+
+                        if (mode) {
+                            val editor = sp.edit()
+                            editor.putBoolean(cf.spFirstLaunch, true)
+                            editor.putString(cf.spPassword, password)
+                            editor.apply()
+                            callbacks?.onLoginFragment(null)
+                            cf.toast(requireContext(), "Настройки сохранены")
+                        }
                     }
                 })
 
-                promptInfo = BiometricPrompt.PromptInfo.Builder()
-                    .setTitle("Вход в MagicPasswords")
-                    .setNegativeButtonText("Отмена")
-                    .build()
+                promptInfo = if (!mode) {
+                    BiometricPrompt.PromptInfo.Builder()
+                        .setTitle("Вход в MagicPasswords")
+                        .setNegativeButtonText("Отмена")
+                        .build()
+                } else {
+                    BiometricPrompt.PromptInfo.Builder()
+                        .setTitle("Отпечаток пальца")
+                        .setSubtitle("Добавить биометрическую аутентификацию?")
+                        .setNegativeButtonText("Отмена")
+                        .build()
+                }
 
                 biometricPrompt.authenticate(promptInfo)
         }
@@ -173,11 +215,19 @@ class LoginFragment : Fragment() {
             if (!firstLaunch) {
                 if (secondPassword.isNotEmpty()) {
                     if (password == secondPassword) {
-                        val editor = sp.edit()
-                        editor.putBoolean(cf.spFirstLaunch, true)
-                        editor.putString(cf.spPassword, password)
-                        editor.apply()
-                        callbacks?.onLoginFragment(null)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (requireContext().packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT) &&
+                                !sp.getBoolean(cf.spFingerPrint, false)) {
+                                showFingerprint(true)
+                            }
+                        } else {
+                            val editor = sp.edit()
+                            editor.putBoolean(cf.spFirstLaunch, true)
+                            editor.putString(cf.spPassword, password)
+                            editor.apply()
+                            callbacks?.onLoginFragment(null)
+                            cf.toast(requireContext(), "Настройки сохранены")
+                        }
                     } else {
                         cf.toast(requireContext(), "Пароли не совпадают")
                     }
@@ -282,7 +332,7 @@ class LoginFragment : Fragment() {
             }
         }
         binding.fingerprintButton.setOnClickListener {
-            showFingerprint()
+            showFingerprint(false)
         }
     }
 
