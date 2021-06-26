@@ -9,12 +9,14 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import com.github.llmaximll.magicpasswords.BuildConfig
+import com.google.android.material.snackbar.Snackbar
 
 private const val SP_NAME = "sp_magic_passwords"
 
@@ -35,6 +37,15 @@ class CommonFunctions private constructor() {
         }
     }
 
+    fun snackBar(contextView: View, message: String, actionFunc: () -> Unit) {
+        Snackbar.make(contextView, message, Snackbar.LENGTH_LONG).apply {
+            setAction("Отмена") {
+                actionFunc()
+            }
+            show()
+        }
+    }
+
     fun log(tag: String, message: String) {
         if (BuildConfig.DEBUG) {
             Log.i(tag, message)
@@ -50,15 +61,17 @@ class CommonFunctions private constructor() {
         @IdRes containerViewId: Int,
         fragment: Fragment,
         backStack: Boolean = false,
+        backStackTag: String = "",
         animation: Boolean = false,
         transition: Boolean = false,
         sharedView: View? = null
     ) {
         supportFragmentManager
             .beginTransaction()
-            .replace(containerViewId, fragment)
             .apply {
-                if (backStack) addToBackStack(null)
+                if (backStack) {
+                    addToBackStack(backStackTag)
+                }
                 if (animation) setCustomAnimations(
                     android.R.animator.fade_in,
                     android.R.animator.fade_out,
@@ -69,6 +82,7 @@ class CommonFunctions private constructor() {
                     addSharedElement(sharedView, sharedView.transitionName)
                 }
             }
+            .replace(containerViewId, fragment)
             .commit()
     }
 

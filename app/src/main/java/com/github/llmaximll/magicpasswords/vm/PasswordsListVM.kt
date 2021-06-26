@@ -4,10 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class PasswordsListVM : ViewModel() {
     private val repository = MagicRepository.get()
@@ -20,8 +19,9 @@ class PasswordsListVM : ViewModel() {
         }
     }
 
-    fun deletePassword(password: PasswordInfo) {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun deletePassword(job: Job, password: PasswordInfo) {
+        CoroutineScope(Dispatchers.IO + job).launch {
+            delay(2750L)
             repository.deletePassword(password)
         }
     }

@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionInflater
+import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.adaptersholders.PasswordsListAdapter
 import com.github.llmaximll.magicpasswords.adaptersholders.SimpleItemTouchHelperCallback
@@ -19,7 +20,6 @@ import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentPasswordsListBinding
 import com.github.llmaximll.magicpasswords.vm.PasswordsListVM
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -83,7 +83,6 @@ class PasswordsListFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.passwordsList.collect { passwordsList ->
                 setRecyclerView(passwordsList)
-                cf.log(TAG, "passwordsList=$passwordsList")
             }
         }
     }
@@ -92,11 +91,9 @@ class PasswordsListFragment : Fragment() {
         toolBar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.add -> {
-                    cf.toast(requireContext(), "Добавить пароль")
                     callbacks?.onPasswordsListFragment("add", "null", null)
                 }
                 R.id.settings -> {
-                    cf.toast(requireContext(), "Настройки")
                     callbacks?.onPasswordsListFragment("settings", "null", null)
                 }
             }
@@ -110,7 +107,7 @@ class PasswordsListFragment : Fragment() {
         if (passwordsList.isNotEmpty()) {
             val rV = binding.passwordsRecyclerView
             rV.layoutManager = LinearLayoutManager(requireContext())
-            val adapter = PasswordsListAdapter(callbacks, mutPasswordsList, viewModel, requireContext())
+            val adapter = PasswordsListAdapter(callbacks, mutPasswordsList, viewModel, requireContext(), binding.coordinatorLayout)
             rV.adapter = adapter
             val callback = SimpleItemTouchHelperCallback(adapter)
             val touchHelper = ItemTouchHelper(callback)

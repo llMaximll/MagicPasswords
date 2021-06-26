@@ -1,12 +1,13 @@
 package com.github.llmaximll.magicpasswords
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.FragmentManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.transition.TransitionInflater
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
-import com.github.llmaximll.magicpasswords.fragments.*
+import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
+import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
+import com.github.llmaximll.magicpasswords.fragments.SettingsFragment
 
 class MainActivity : AppCompatActivity(),
     PasswordsListFragment.Callbacks,
@@ -59,7 +60,6 @@ class MainActivity : AppCompatActivity(),
             supportFragmentManager,
             R.id.container_fragment,
             mFragment,
-            backStack = true,
             animation = true,
             transition = true,
             sharedView = sharedView
@@ -75,7 +75,28 @@ class MainActivity : AppCompatActivity(),
             backStack = false,
             animation = true
         )
-        // удаление предыдущего фрагмента из backstack
-        supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    }
+
+    override fun onBackPressed() {
+        val fm = supportFragmentManager
+        var backPressedListener: OnBackPressedListener? = null
+        for (fragment in fm.fragments) {
+            if (fragment is OnBackPressedListener) {
+                backPressedListener = fragment
+                break
+            }
+        }
+        if (backPressedListener != null) {
+            val fragment = PasswordsListFragment.newInstance()
+            cf.changeFragment(
+                fm,
+                R.id.container_fragment,
+                fragment,
+                backStack = false,
+                animation = true
+            )
+        } else {
+            super.onBackPressed()
+        }
     }
 }

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentChangePasswordBinding
@@ -19,7 +20,8 @@ import java.util.*
 private const val ARG_ID_PASSWORD = "arg_id_password"
 private const val ARG_TRANSITION_NAME = "arg_transition_name"
 
-class ChangePasswordFragment : Fragment() {
+class ChangePasswordFragment : Fragment(),
+    OnBackPressedListener {
 
     interface Callbacks {
         fun onChangePasswordFragment()
@@ -70,7 +72,6 @@ class ChangePasswordFragment : Fragment() {
             if (viewModel.checkFields(requireContext(), name, password, password2, description)) {
                 viewModel.addPassword(PasswordInfo(name = name, password = password, description = description))
                 callbacks?.onChangePasswordFragment()
-                cf.toast(requireContext(), "OK")
             }
         }
         binding.changeButton.setOnClickListener {
@@ -81,20 +82,14 @@ class ChangePasswordFragment : Fragment() {
             if (viewModel.checkFields(requireContext(), name, password, password2, description)) {
                 viewModel.updatePassword(PasswordInfo(id = idPassword, name = name, password = password, description = description))
                 callbacks?.onChangePasswordFragment()
-                cf.toast(requireContext(), "Обновить")
             }
         }
         binding.passwordToggleCheckBox.setOnCheckedChangeListener { _, isChecked ->
             if (!isChecked) {
                 binding.passwordEditText.inputType = 129
-            } else {
-                binding.passwordEditText.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
-            }
-        }
-        binding.passwordToggleCheckBox2.setOnCheckedChangeListener { _, isChecked ->
-            if (!isChecked) {
                 binding.passwordEditText2.inputType = 129
             } else {
+                binding.passwordEditText.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
                 binding.passwordEditText2.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
         }
@@ -113,6 +108,10 @@ class ChangePasswordFragment : Fragment() {
         }
         //transition
         binding.scrollView.transitionName = transitionName
+        binding.nameEditText.setText("0")
+        binding.passwordEditText.setText("0")
+        binding.passwordEditText2.setText("0")
+        binding.descriptionEditText.setText("0")
     }
 
     override fun onDetach() {
@@ -145,4 +144,6 @@ class ChangePasswordFragment : Fragment() {
             }
         }
     }
+
+    override fun onBackPressed(): Boolean = true
 }

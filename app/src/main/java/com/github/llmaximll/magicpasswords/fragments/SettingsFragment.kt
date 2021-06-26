@@ -8,13 +8,15 @@ import android.view.ViewGroup
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.databinding.FragmentSettingsBinding
 import com.github.llmaximll.magicpasswords.vm.SettingsVM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : Fragment(),
+    OnBackPressedListener {
 
     private lateinit var binding: FragmentSettingsBinding
     private lateinit var cf: CommonFunctions
@@ -116,4 +118,6 @@ class SettingsFragment : Fragment() {
     companion object {
         fun newInstance(): SettingsFragment = SettingsFragment()
     }
+
+    override fun onBackPressed(): Boolean = true
 }
