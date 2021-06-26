@@ -12,7 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionInflater
-import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.adaptersholders.PasswordsListAdapter
 import com.github.llmaximll.magicpasswords.adaptersholders.SimpleItemTouchHelperCallback
@@ -58,7 +57,6 @@ class PasswordsListFragment : Fragment() {
         binding = FragmentPasswordsListBinding.inflate(inflater, container, false)
 
         setToolBar()
-        cf.log(TAG, "onCreateView()")
 
         return binding.root
     }
@@ -67,7 +65,6 @@ class PasswordsListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = cf.initViewModel(this, PasswordsListVM::class.java) as PasswordsListVM
         getAllPasswords()
-        cf.log(TAG, "onViewCreated()")
         //transition
         postponeEnterTransition()
         binding.coordinatorLayout.doOnPreDraw { startPostponedEnterTransition() }
@@ -79,7 +76,7 @@ class PasswordsListFragment : Fragment() {
     }
 
     private fun getAllPasswords() {
-        viewModel.getAllPasswords()
+        viewModel.getAllPasswords(0)
         lifecycleScope.launch {
             viewModel.passwordsList.collect { passwordsList ->
                 setRecyclerView(passwordsList)
@@ -95,6 +92,9 @@ class PasswordsListFragment : Fragment() {
                 }
                 R.id.settings -> {
                     callbacks?.onPasswordsListFragment("settings", "null", null)
+                }
+                R.id.recycle_bin -> {
+                    callbacks?.onPasswordsListFragment("recycle bin", "null", null)
                 }
             }
             true

@@ -18,8 +18,8 @@ class MagicRepository private constructor(context: Context) {
 
     private val magicDao = database.magicDao()
 
-    suspend fun getAllPasswords(): List<PasswordInfo> =
-        magicDao.getAllPasswords()
+    suspend fun getAllPasswords(removed: Int = 0): List<PasswordInfo> =
+        magicDao.getAllPasswords(removed)
 
     suspend fun getPasswordInfo(idPassword: UUID): PasswordInfo =
         magicDao.getPasswordInfo(idPassword)

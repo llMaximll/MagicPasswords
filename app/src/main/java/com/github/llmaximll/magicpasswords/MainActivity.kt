@@ -7,6 +7,7 @@ import androidx.transition.TransitionInflater
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
 import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
+import com.github.llmaximll.magicpasswords.fragments.RecycleBinFragment
 import com.github.llmaximll.magicpasswords.fragments.SettingsFragment
 
 class MainActivity : AppCompatActivity(),
@@ -40,6 +41,9 @@ class MainActivity : AppCompatActivity(),
             }
             "settings" -> {
                 SettingsFragment.newInstance()
+            }
+            "recycle bin" -> {
+                RecycleBinFragment.newInstance()
             }
             "change" -> ChangePasswordFragment.newInstance(idPassword, sharedView?.transitionName
                 ?: "null")

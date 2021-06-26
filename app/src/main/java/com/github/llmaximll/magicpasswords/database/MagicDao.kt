@@ -6,9 +6,8 @@ import java.util.*
 
 @Dao
 interface MagicDao {
-
-    @Query("SELECT * FROM PasswordInfo")
-    suspend fun getAllPasswords(): List<PasswordInfo>
+    @Query("SELECT * FROM PasswordInfo WHERE removed=(:removed)")
+    suspend fun getAllPasswords(removed: Int = 0): List<PasswordInfo>
 
     @Query("SELECT * FROM PasswordInfo WHERE id=(:idPassword)")
     suspend fun getPasswordInfo(idPassword: UUID): PasswordInfo

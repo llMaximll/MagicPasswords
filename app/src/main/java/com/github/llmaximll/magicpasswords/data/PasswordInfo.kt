@@ -9,5 +9,6 @@ data class PasswordInfo(
     @PrimaryKey val id: UUID = UUID.randomUUID(),
     val name: String,
     val password: String,
-    val description: String = ""
+    val description: String = "",
+    var removed: Int = 0
 )

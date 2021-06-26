@@ -9,20 +9,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class PasswordsListVM : ViewModel() {
+class RecycleBinVM : ViewModel() {
     private val repository = MagicRepository.get()
     private val _passwordsList = MutableStateFlow<List<PasswordInfo>>(listOf())
     val passwordsList = _passwordsList.asStateFlow()
 
-    fun getAllPasswords(removed: Int = 0) {
+    fun getAllPasswords(removed: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
             _passwordsList.value = repository.getAllPasswords(removed)
-        }
-    }
-
-    fun updatePassword(password: PasswordInfo) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updatePassword(password)
         }
     }
 }

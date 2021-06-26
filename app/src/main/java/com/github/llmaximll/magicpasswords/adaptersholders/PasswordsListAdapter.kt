@@ -38,13 +38,14 @@ class PasswordsListAdapter(
     override fun getItemCount(): Int = passwordsList.size
 
     override fun onItemDismiss(position: Int) {
-        val deletePasswordJob = Job()
         val password = passwordsList[position]
         passwordsList.remove(password)
         notifyItemRemoved(position)
-        viewModel.deletePassword(deletePasswordJob, password)
+        password.removed = 1
+        viewModel.updatePassword(password)
         fun cancelSnackBar() {
-            deletePasswordJob.cancel()
+            password.removed = 0
+            viewModel.updatePassword(password)
             passwordsList.add(position, password)
             notifyItemInserted(position)
         }
