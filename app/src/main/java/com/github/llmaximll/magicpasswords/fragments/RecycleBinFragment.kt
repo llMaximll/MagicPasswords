@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.adaptersholders.RemovedPasswordsListAdapter
+import com.github.llmaximll.magicpasswords.adaptersholders.SimpleItemTouchHelperCallbackRemoved
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentRecycleBinBinding
@@ -62,6 +64,9 @@ class RecycleBinFragment : Fragment(),
             rV.layoutManager = LinearLayoutManager(requireContext())
             val adapter = RemovedPasswordsListAdapter(mutPasswordsList, viewModel, requireContext(), binding.coordinatorLayout)
             rV.adapter = adapter
+            val callback = SimpleItemTouchHelperCallbackRemoved(adapter)
+            val touchHelper = ItemTouchHelper(callback)
+            touchHelper.attachToRecyclerView(rV)
         }
     }
 

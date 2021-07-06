@@ -20,4 +20,7 @@ interface MagicDao {
 
     @Delete
     fun deletePassword(passwordInfo: PasswordInfo)
+    
+    @Query("DELETE FROM PasswordInfo WHERE id=(:passwordId)")
+    fun deletePasswordById(passwordId: UUID)
 }

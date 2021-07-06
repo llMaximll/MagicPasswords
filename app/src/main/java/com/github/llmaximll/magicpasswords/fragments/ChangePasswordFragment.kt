@@ -108,10 +108,6 @@ class ChangePasswordFragment : Fragment(),
         }
         //transition
         binding.scrollView.transitionName = transitionName
-        binding.nameEditText.setText("0")
-        binding.passwordEditText.setText("0")
-        binding.passwordEditText2.setText("0")
-        binding.descriptionEditText.setText("0")
     }
 
     override fun onDetach() {

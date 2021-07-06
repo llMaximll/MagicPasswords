@@ -19,4 +19,10 @@ class RecycleBinVM : ViewModel() {
             _passwordsList.value = repository.getAllPasswords(removed)
         }
     }
+
+    fun deletePassword(password: PasswordInfo) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deletePassword(password)
+        }
+    }
 }

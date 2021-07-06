@@ -25,7 +25,10 @@
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_reset_password.xml" value="0.1638888888888889" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_settings.xml" value="0.1638888888888889" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/item_rv_passwords_list.xml" value="0.1638888888888889" />
+        <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/item_rv_removed_passwords_list.xml" value="0.1638888888888889" />
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/menu/tool_bar_fragment_passwords_list.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/llMaximll/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/item_rv_passwords_list.xml" value="0.1638888888888889" />
+        <entry key="..\:/Users/llMaximll/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/item_rv_removed_passwords_list.xml" value="0.1638888888888889" />
       </map>
     </option>
   </component>

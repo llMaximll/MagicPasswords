@@ -10,5 +10,6 @@ data class PasswordInfo(
     val name: String,
     val password: String,
     val description: String = "",
-    var removed: Int = 0
+    var removed: Int = 0,
+    var removedDate: Long = 0L
 )
