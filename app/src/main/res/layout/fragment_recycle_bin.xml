@@ -23,7 +23,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:title="Корзина"
-                app:titleTextColor="@color/white"/>
+                app:titleTextColor="@color/white"
+                app:menu="@menu/tool_bar_fragment_recycle_bin"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

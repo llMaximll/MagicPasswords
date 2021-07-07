@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(),
                 break
             }
         }
-        if (backPressedListener != null) {
+        if (backPressedListener?.onBackPressed() == true) {
             val fragment = PasswordsListFragment.newInstance()
             cf.changeFragment(
                 fm,
@@ -99,7 +99,8 @@ class MainActivity : AppCompatActivity(),
                 backStack = false,
                 animation = true
             )
-        } else {
+        }
+        if (backPressedListener?.onBackPressed() == null) {
             super.onBackPressed()
         }
     }
