@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.adaptersholders.RemovedPasswordsListAdapter
-import com.github.llmaximll.magicpasswords.adaptersholders.SimpleItemTouchHelperCallbackRemoved
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentRecycleBinBinding
@@ -79,9 +78,23 @@ class RecycleBinFragment : Fragment(),
         toolBar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.delete_passwords -> {
-                    if (viewModel.deletedPasswordsMMap.isNotEmpty()) {
-                        viewModel.deletePasswords(viewModel.deletedPasswordsMMap)
-                        passwordsList.removeAll(viewModel.deletedPasswordsMMap.values)
+                    if (viewModel.selectedPasswordsMMap.isNotEmpty()) {
+                        viewModel.deletePasswords(viewModel.selectedPasswordsMMap)
+                        passwordsList.removeAll(viewModel.selectedPasswordsMMap.values)
+                        setRecyclerView(passwordsList)
+                        viewModel.selected.value = false
+                    } else {
+                        cf.toast(requireContext(), "Не выбраны элементы списка")
+                    }
+                }
+                R.id.recover_passwords -> {
+                    if (viewModel.selectedPasswordsMMap.isNotEmpty()) {
+                        passwordsList.removeAll(viewModel.selectedPasswordsMMap.values)
+                        for (pass in viewModel.selectedPasswordsMMap.values) {
+                            pass.removed = 0
+                            pass.removedDate = 0L
+                        }
+                        viewModel.recoverPasswords(viewModel.selectedPasswordsMMap, requireContext())
                         setRecyclerView(passwordsList)
                         viewModel.selected.value = false
                     } else {
@@ -100,20 +113,16 @@ class RecycleBinFragment : Fragment(),
         rV.layoutManager = LinearLayoutManager(requireContext())
         adapter = RemovedPasswordsListAdapter(mutPasswordsList, viewModel, requireContext())
         rV.adapter = adapter
-        val callback = SimpleItemTouchHelperCallbackRemoved(adapter)
-        val touchHelper = ItemTouchHelper(callback)
-        touchHelper.attachToRecyclerView(rV)
     }
-
     /**
      * В зависимости от переменной viewModel.selected функция выполняет то или иное состояние фрагмента (внешний вид)
      */
     private fun setSelectedFragment() {
         lifecycleScope.launch {
             viewModel.selected.collect {
-                cf.toast(requireContext(), "selected=$it")
                 binding.toolBar.menu.findItem(R.id.delete_passwords).isVisible = it
-                if (!it) viewModel.deletedPasswordsMMap.clear()
+                binding.toolBar.menu.findItem(R.id.recover_passwords).isVisible = it
+                if (!it) viewModel.selectedPasswordsMMap.clear()
             }
         }
     }

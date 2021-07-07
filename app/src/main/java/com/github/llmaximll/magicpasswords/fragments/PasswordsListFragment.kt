@@ -70,6 +70,13 @@ class PasswordsListFragment : Fragment() {
         binding.coordinatorLayout.doOnPreDraw { startPostponedEnterTransition() }
     }
 
+    override fun onStart() {
+        super.onStart()
+        binding.addPasswordFab.setOnClickListener {
+            callbacks?.onPasswordsListFragment("add", "null", null)
+        }
+    }
+
     override fun onDetach() {
         super.onDetach()
         callbacks = null
@@ -87,9 +94,6 @@ class PasswordsListFragment : Fragment() {
     private fun setToolBar(toolBar: Toolbar = binding.toolBar) {
         toolBar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.add -> {
-                    callbacks?.onPasswordsListFragment("add", "null", null)
-                }
                 R.id.settings -> {
                     callbacks?.onPasswordsListFragment("settings", "null", null)
                 }

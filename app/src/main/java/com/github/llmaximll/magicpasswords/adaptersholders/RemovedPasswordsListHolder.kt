@@ -43,7 +43,7 @@ class RemovedPasswordsListHolder(itemView: View, private val viewModel: RecycleB
         dateTextView.text = "До удаления: ${30 - minutes} дней"
         if (viewModel.selected.value) {
             var checked = false
-            for (key in viewModel.deletedPasswordsMMap.keys) {
+            for (key in viewModel.selectedPasswordsMMap.keys) {
                 if (key == adapterPosition) {
                     checked = true
                     checkBox.isChecked = true
@@ -86,9 +86,9 @@ class RemovedPasswordsListHolder(itemView: View, private val viewModel: RecycleB
                     cf.log(TAG, "onClick()")
                     checkBox.isChecked = !checkBox.isChecked
                     if (checkBox.isChecked) {
-                        viewModel.deletedPasswordsMMap[adapterPosition] = passwordInfo
+                        viewModel.selectedPasswordsMMap[adapterPosition] = passwordInfo
                     } else {
-                        viewModel.deletedPasswordsMMap.remove(adapterPosition)
+                        viewModel.selectedPasswordsMMap.remove(adapterPosition)
                     }
                 }
                 v?.performClick()

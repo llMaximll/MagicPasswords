@@ -1,7 +1,9 @@
 package com.github.llmaximll.magicpasswords.vm
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import kotlinx.coroutines.Dispatchers
@@ -18,11 +20,25 @@ class RecycleBinVM : ViewModel() {
      * false - стандартное, true - какой-то элемент списка выделен
      */
     val selected = MutableStateFlow(false)
-    val deletedPasswordsMMap = mutableMapOf<Int, PasswordInfo>()
+    val selectedPasswordsMMap = mutableMapOf<Int, PasswordInfo>()
 
     fun getAllPasswords(removed: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
             _passwordsList.value = repository.getAllPasswords(removed)
+        }
+    }
+
+    private fun recoverPassword(password: PasswordInfo, context: Context) {
+        val workManager = WorkManager.getInstance(context)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updatePassword(password)
+            workManager.cancelAllWorkByTag("${password.id}")
+        }
+    }
+
+    fun recoverPasswords(mMap: MutableMap<Int, PasswordInfo>, context: Context) {
+        repeat(mMap.size) {
+            recoverPassword(mMap.values.elementAt(it), context)
         }
     }
 
@@ -33,10 +49,8 @@ class RecycleBinVM : ViewModel() {
     }
 
     fun deletePasswords(mMap: MutableMap<Int, PasswordInfo>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repeat(mMap.size) {
-                deletePassword(mMap.values.elementAt(it))
-            }
+        repeat(mMap.size) {
+            deletePassword(mMap.values.elementAt(it))
         }
     }
 }

@@ -22,7 +22,7 @@ class RemovedPasswordsListAdapter(
     private val viewModel: RecycleBinVM,
     private val context: Context
 ) :
-    RecyclerView.Adapter<RemovedPasswordsListHolder>(), ItemTouchHelperAdapter {
+    RecyclerView.Adapter<RemovedPasswordsListHolder>() {
 
     private val workManager = WorkManager.getInstance(context)
     private lateinit var view: View
@@ -43,13 +43,6 @@ class RemovedPasswordsListAdapter(
     }
 
     override fun getItemCount(): Int = passwordsList.size
-
-    override fun onItemDismiss(position: Int) {
-        deletePasswordWorkManager("${password.id}")
-        password.removed = 0
-        password.removedDate = 0L
-        viewModel.deletePassword(password)
-    }
 
     private fun deletePasswordWorkManager(tag: String) {
         workManager.cancelAllWorkByTag(tag)

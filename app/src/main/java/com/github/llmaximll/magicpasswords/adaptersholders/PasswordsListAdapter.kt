@@ -71,6 +71,5 @@ class PasswordsListAdapter(
             setInitialDelay(30, TimeUnit.DAYS)
         }.build()
         workManager.enqueue(myWorkRequest)
-        cf.toast(context, "deletePasswordWorkManager")
     }
 }
