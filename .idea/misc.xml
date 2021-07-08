@@ -29,9 +29,20 @@
         <entry key="..\:/AndroidStudioProjects/MagicPasswords/app/src/main/res/menu/tool_bar_fragment_passwords_list.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/llMaximll/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/item_rv_passwords_list.xml" value="0.1638888888888889" />
         <entry key="..\:/Users/llMaximll/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/item_rv_removed_passwords_list.xml" value="0.1638888888888889" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/circle_password_on.xml" value="0.1115" />
         <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/ic_add.xml" value="0.168" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/ic_delete.xml" value="0.1115" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/ic_fingerprint.xml" value="0.1115" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/ic_temporary_files.xml" value="0.1115" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/drawable/item_rv_passwords_list.xml" value="0.1115" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/activity_main.xml" value="0.1638888888888889" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_change_password.xml" value="0.1638888888888889" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_login.xml" value="0.1638888888888889" />
         <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_passwords_list.xml" value="0.1953125" />
         <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_recycle_bin.xml" value="0.1638888888888889" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_reset_password.xml" value="0.1638888888888889" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/fragment_settings.xml" value="0.1638888888888889" />
+        <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/item_rv_passwords_list.xml" value="0.1638888888888889" />
         <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/layout/item_rv_removed_passwords_list.xml" value="0.1953125" />
         <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/menu/tool_bar_fragment_passwords_list.xml" value="0.1638888888888889" />
         <entry key="..\:/Users/llMaximll/OneDrive/Documents/Programming/AndroidStudioProjects/MagicPasswords/app/src/main/res/menu/tool_bar_fragment_recycle_bin.xml" value="0.1638888888888889" />

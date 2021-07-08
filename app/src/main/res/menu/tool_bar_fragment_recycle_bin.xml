@@ -6,7 +6,7 @@
         android:title="Восстановить"
         android:icon="@drawable/ic_temporary_files"
         app:showAsAction="ifRoom"
-        android:visible="false"/>
+        android:visible="false" />
     <item
         android:id="@+id/delete_passwords"
         android:title="Удалить"

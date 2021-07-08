@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.MaterialComponents.FloatingActionButton.FAB">
+        <item name="backgroundTint">#8D8D8D</item>
+    </style>
+    <style name="Widget.MaterialComponents.CompoundButton.Switch.MySwitch">
+        <item name="android:colorControlNormal">@color/base</item>
+    </style>
+</resources>

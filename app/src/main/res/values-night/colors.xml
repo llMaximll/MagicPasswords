@@ -8,9 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#808D8D8D</color>
-    <color name="element">#FFFFFF</color>
-    <color name="text">#3A3A3A</color>
+    <color name="element">#484848</color>
+    <color name="text">#B9B9B9</color>
     <color name="base">#003F8E</color>
     <color name="login_circles_on">@color/purple_500</color>
-    <color name="background">#EAE9E9</color>
+    <color name="background">#202020</color>
 </resources>

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F3F3"
+    android:background="@color/background"
     android:id="@+id/coordinatorLayout">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:titleEnabled="false"
-            app:layout_scrollFlags="scroll|enterAlways">
+            app:layout_scrollFlags="scroll|enterAlways"
+            android:background="?attr/colorPrimary">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolBar"
@@ -24,6 +25,7 @@
                 android:layout_height="match_parent"
                 app:title="Корзина"
                 app:titleTextColor="@color/white"
+                android:background="?attr/colorPrimary"
                 app:menu="@menu/tool_bar_fragment_recycle_bin"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
