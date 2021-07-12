@@ -1,57 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.factor.bouncy.BouncyNestedScrollView
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:overScrollMode="always"
-    app:recyclerview_fling_animation_size=".7"
-    app:recyclerview_overscroll_animation_size=".7"
-    app:recyclerview_damping_ratio="DAMPING_RATIO_LOW_BOUNCY"
-    app:recyclerview_stiffness="STIFFNESS_MEDIUM"
     android:background="?attr/colorOnPrimary">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/fingerprint_linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/fingerprint_textView"
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/change_theme_button"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.15"
+                android:layout_height="wrap_content"
+                android:text="Выбор темы"
                 android:padding="10dp"
                 android:gravity="start|center"
-                android:text="Отпечаток пальца"
-                android:textSize="18sp"
-                android:textColor="@color/text"/>
+                android:textColor="@color/text"
+                android:textAllCaps="false"
+                android:textSize="18sp" />
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                style="@style/Widget.MaterialComponents.CompoundButton.Switch.MySwitch"
-                android:id="@+id/fingerprint_switch"
+            <LinearLayout
+                android:id="@+id/fingerprint_linearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:id="@+id/fingerprint_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.15"
+                    android:padding="10dp"
+                    android:gravity="start|center"
+                    android:text="Отпечаток пальца"
+                    android:textColor="@color/text"
+                    android:textAllCaps="false"
+                    android:textSize="18sp"/>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/fingerprint_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/reset_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:gravity="start|center"
+                android:text="Сброс пароля"
+                android:textColor="@color/text"
+                android:textAllCaps="false"
+                android:textSize="18sp"/>
 
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:id="@+id/reset_button"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:padding="10dp"
-            android:gravity="start|center"
-            android:text="Сброс пароля"
-            android:textColor="@color/text"/>
+    </ScrollView>
 
-    </LinearLayout>
-
-</com.factor.bouncy.BouncyNestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

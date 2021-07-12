@@ -13,7 +13,5 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- FAB -->
         <item name="floatingActionButtonStyle">@style/Widget.MaterialComponents.FloatingActionButton.FAB</item>
-        <!-- Switch -->
-        <item name="switchStyle">@style/Widget.MaterialComponents.CompoundButton.Switch.MySwitch</item>
     </style>
 </resources>

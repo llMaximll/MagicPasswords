@@ -18,8 +18,11 @@ interface MagicDao {
     @Update
     fun updatePassword(passwordInfo: PasswordInfo)
 
+    @Update
+    fun updateAllPasswords(passwordInfoList: List<PasswordInfo>): Int
+
     @Delete
-    fun deletePassword(passwordInfo: PasswordInfo)
+    fun deleteAllPasswords(passwordInfoList: List<PasswordInfo>): Int
     
     @Query("DELETE FROM PasswordInfo WHERE id=(:passwordId)")
     fun deletePasswordById(passwordId: UUID)

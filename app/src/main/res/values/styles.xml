@@ -3,7 +3,10 @@
     <style name="Widget.MaterialComponents.FloatingActionButton.FAB">
         <item name="backgroundTint">#8D8D8D</item>
     </style>
-    <style name="Widget.MaterialComponents.CompoundButton.Switch.MySwitch">
-        <item name="android:colorControlNormal">@color/base</item>
+    <style name="Widget.Support.CoordinatorLayout.CoordinatorLayoutDay">
+        <item name="background">@color/background</item>
+    </style>
+    <style name="Widget.Support.CoordinatorLayout.CoordinatorLayoutNight">
+        <item name="background">@color/background</item>
     </style>
 </resources>

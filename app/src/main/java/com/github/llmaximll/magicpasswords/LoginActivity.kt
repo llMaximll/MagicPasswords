@@ -20,11 +20,16 @@ class LoginActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        cf = CommonFunctions.get()
+        sp = cf.getSharedPreferences(this)
+        when (sp.getInt(cf.spThemeApp, 0)) {
+            0 -> setTheme(R.style.Theme_MagicPasswords)
+            1 -> setTheme(R.style.Theme_MagicPasswordsDay)
+            2 -> setTheme(R.style.Theme_MagicPasswordsNight)
+        }
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        cf = CommonFunctions.get()
-        sp = cf.getSharedPreferences(this)
         firstLaunch = sp.getBoolean(cf.spFirstLaunch, false)
 
         val currentFragment = supportFragmentManager

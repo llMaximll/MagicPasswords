@@ -41,14 +41,18 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0-alpha02'
+
     implementation 'androidx.fragment:fragment-ktx:1.3.5'
-    implementation 'androidx.room:room-ktx:2.4.0-alpha03'
-    kapt 'androidx.room:room-compiler:2.4.0-alpha03'
-    implementation 'com.factor:bouncy:1.8'
     implementation 'androidx.biometric:biometric:1.2.0-alpha03'
-    implementation 'androidx.work:work-runtime-ktx:2.6.0-beta01'
+    implementation 'androidx.work:work-runtime-ktx:2.6.0-beta01' //WorkManager
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    
+    implementation 'androidx.room:room-ktx:2.4.0-alpha03'
+    kapt 'androidx.room:room-compiler:2.4.0-alpha03'
 }

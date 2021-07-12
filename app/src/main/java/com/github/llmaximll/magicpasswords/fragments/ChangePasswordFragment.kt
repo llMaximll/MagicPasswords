@@ -7,7 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.github.llmaximll.magicpasswords.MainActivity
 import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 
+private const val TAG = "ChangePasswordFragment"
 private const val ARG_ID_PASSWORD = "arg_id_password"
 private const val ARG_TRANSITION_NAME = "arg_transition_name"
 
@@ -43,7 +47,7 @@ class ChangePasswordFragment : Fragment(),
         //arguments
         val id = arguments?.getString(ARG_ID_PASSWORD)
         transitionName = arguments?.getString(ARG_TRANSITION_NAME) ?: "transition_null"
-            if (id != "null") {
+        if (id != "null") {
             idPassword = UUID.fromString(id)
         }
     }
@@ -117,16 +121,29 @@ class ChangePasswordFragment : Fragment(),
 
     private fun restorePassword() {
         viewModel.getPasswordInfo(idPassword)
-        lifecycleScope.launch {
-            viewModel.passwordInfo.collect {
-                binding.nameEditText.setText(it?.name)
-                binding.passwordEditText.setText(it?.password)
-                binding.passwordEditText2.setText(it?.password)
-                binding.descriptionEditText.setText(it?.description)
-            }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.passwordInfoFlow
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect {
+                    binding.nameEditText.setText(it?.name)
+                    binding.passwordEditText.setText(it?.password)
+                    binding.passwordEditText2.setText(it?.password)
+                    binding.descriptionEditText.setText(it?.description)
+                }
         }
         binding.okButton.visibility = View.GONE
         binding.changeButton.visibility = View.VISIBLE
+    }
+
+    override fun onBackPressed(): Boolean {
+        return if (this::idPassword.isInitialized) {
+            cf.log(TAG, "onBackPressed(Change) | true")
+            true
+        } else {
+            cf.log(TAG, "onBackPressed(Change) | false")
+            (activity as? MainActivity)?.replaceMainFragments(MainActivity.REPLACE_ON_PASSWORDS_LIST_FRAGMENT)
+            false
+        }
     }
 
     companion object {
@@ -140,6 +157,4 @@ class ChangePasswordFragment : Fragment(),
             }
         }
     }
-
-    override fun onBackPressed(): Boolean = true
 }

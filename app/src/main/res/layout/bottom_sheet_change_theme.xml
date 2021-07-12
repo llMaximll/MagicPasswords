@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/linearLayout">
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:id="@+id/system_theme_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.15"
+        android:padding="10dp"
+        android:gravity="start|center"
+        android:text="Системная тема"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="18sp"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:id="@+id/light_theme_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.15"
+        android:padding="10dp"
+        android:gravity="start|center"
+        android:text="Светлая тема"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="18sp"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:id="@+id/dark_theme_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.15"
+        android:padding="10dp"
+        android:gravity="start|center"
+        android:text="Темная тема"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="18sp"/>
+
+</LinearLayout>

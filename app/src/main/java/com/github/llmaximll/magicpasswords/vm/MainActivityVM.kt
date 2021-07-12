@@ -7,18 +7,14 @@ import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
 private const val TAG = "ChangePasswordVM"
 
-class ChangePasswordVM : ViewModel() {
+class MainActivityVM : ViewModel() {
     private val repository = MagicRepository.get()
     private val cf = CommonFunctions.get()
-    private val passwordInfoDataFlow = MutableStateFlow<PasswordInfo?>(null)
-    val passwordInfoFlow = passwordInfoDataFlow.asStateFlow()
 
     fun addPassword(passwordInfo: PasswordInfo) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -29,12 +25,6 @@ class ChangePasswordVM : ViewModel() {
     fun updatePassword(passwordInfo: PasswordInfo) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updatePassword(passwordInfo)
-        }
-    }
-
-    fun getPasswordInfo(idPassword: UUID) {
-        viewModelScope.launch(Dispatchers.IO) {
-            passwordInfoDataFlow.value = repository.getPasswordInfo(idPassword)
         }
     }
 

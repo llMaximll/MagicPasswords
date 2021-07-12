@@ -12,4 +12,34 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
     </style>
+
+    <style name="Theme.MagicPasswordsDay" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="coordinatorLayoutStyle">@style/Widget.Support.CoordinatorLayout.CoordinatorLayoutDay</item>
+    </style>
+
+    <style name="Theme.MagicPasswordsNight" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#202020</item>
+        <item name="colorPrimaryVariant">#202020</item>
+        <item name="colorOnPrimary">#202020</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- FAB -->
+        <item name="floatingActionButtonStyle">@style/Widget.MaterialComponents.FloatingActionButton.FAB</item>
+        <item name="coordinatorLayoutStyle">@style/Widget.Support.CoordinatorLayout.CoordinatorLayoutNight</item>
+    </style>
 </resources>

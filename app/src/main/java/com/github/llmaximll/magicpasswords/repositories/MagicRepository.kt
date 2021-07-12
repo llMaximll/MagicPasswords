@@ -32,8 +32,12 @@ class MagicRepository private constructor(context: Context) {
         magicDao.updatePassword(passwordInfo)
     }
 
-    fun deletePassword(passwordInfo: PasswordInfo) {
-        magicDao.deletePassword(passwordInfo)
+    fun updateAllPasswords(passwordInfoList: List<PasswordInfo>): Int {
+        return magicDao.updateAllPasswords(passwordInfoList)
+    }
+
+    fun deleteAllPasswords(passwordInfoList: List<PasswordInfo>): Int {
+        return magicDao.deleteAllPasswords(passwordInfoList)
     }
 
     fun deletePasswordById(passwordId: UUID) {

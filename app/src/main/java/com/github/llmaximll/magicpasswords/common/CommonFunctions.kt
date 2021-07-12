@@ -9,12 +9,12 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.IdRes
-import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.work.WorkManager
 import com.github.llmaximll.magicpasswords.BuildConfig
 import com.google.android.material.snackbar.Snackbar
 
@@ -25,6 +25,7 @@ class CommonFunctions private constructor() {
     val spFirstLaunch = "sp_first_launch"
     val spPassword = "sp_password"
     val spFingerPrint = "sp_fingerprint"
+    val spThemeApp = "sp_theme_app"
 
     fun toast(context: Context, message: String) {
         Toast.makeText(
@@ -54,6 +55,12 @@ class CommonFunctions private constructor() {
 
     fun <T: ViewModel> initViewModel(owner: ViewModelStoreOwner, modelClass: Class<T>): ViewModel {
         return ViewModelProvider(owner).get(modelClass)
+    }
+
+    fun cancelAllWorkByTag(workManager: WorkManager, tagList: List<String>) {
+        for(tag in tagList) {
+            workManager.cancelAllWorkByTag(tag)
+        }
     }
 
     fun changeFragment(
@@ -86,10 +93,10 @@ class CommonFunctions private constructor() {
             .commit()
     }
 
-    fun animateView(view: View, reverse: Boolean, zChange: Boolean) {
+    fun animateView(view: View, reverse: Boolean, zChange: Boolean, countValue: Float = 0.95f) {
         if (!reverse) {
-            val animatorX = ObjectAnimator.ofFloat(view, "scaleX", 0.95f)
-            val animatorY = ObjectAnimator.ofFloat(view, "scaleY", 0.95f)
+            val animatorX = ObjectAnimator.ofFloat(view, "scaleX", countValue)
+            val animatorY = ObjectAnimator.ofFloat(view, "scaleY", countValue)
             AnimatorSet().apply {
                 playTogether(animatorX, animatorY)
                 duration = 150
@@ -122,17 +129,18 @@ class CommonFunctions private constructor() {
 
     companion object {
         private var INSTANCE: CommonFunctions? = null
-
         fun init() {
             if (INSTANCE == null) {
                 INSTANCE = CommonFunctions()
             }
         }
-
         fun get(): CommonFunctions {
             return requireNotNull(INSTANCE) {
                 "CommonFunctions should be initialized"
             }
         }
+        const val SystemTheme = 0
+        const val LightTheme = 1
+        const val DarkTheme = 2
     }
 }
