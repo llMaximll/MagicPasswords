@@ -1,10 +1,10 @@
 package com.github.llmaximll.magicpasswords.adaptersholders
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.WorkManager
 import com.github.llmaximll.magicpasswords.R
@@ -20,7 +20,8 @@ import kotlinx.coroutines.launch
 class RemovedPasswordsListAdapter(
     private var passwordsList: MutableList<PasswordInfo>,
     private val viewModel: RecycleBinVM,
-    private val context: Context
+    private val context: Context,
+    private val setAll: Boolean
 ) :
     RecyclerView.Adapter<RemovedPasswordsListHolder>() {
 
@@ -39,7 +40,7 @@ class RemovedPasswordsListAdapter(
     override fun onBindViewHolder(holder: RemovedPasswordsListHolder, position: Int) {
         val passwordInfo = passwordsList[position]
         password = passwordInfo
-        holder.bind(passwordInfo)
+        holder.bind(passwordInfo, position)
     }
 
     override fun getItemCount(): Int = passwordsList.size

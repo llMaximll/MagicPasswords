@@ -116,18 +116,21 @@ class RecycleBinFragment : Fragment(),
                         cf.toast(requireContext(), "Не выбраны элементы списка")
                     }
                 }
+                R.id.select_all -> {
+                    setRecyclerView(passwordsList, true)
+                }
             }
             true
         }
     }
 
-    private fun setRecyclerView(passwordsList: List<PasswordInfo>) {
+    private fun setRecyclerView(passwordsList: List<PasswordInfo>, setAll: Boolean = false) {
         val mutPasswordsList = mutableListOf<PasswordInfo>()
         mutPasswordsList.addAll(passwordsList)
         val rV = binding.passwordsRecyclerView
         rV.layoutManager = LinearLayoutManager(requireContext())
         rV.layoutManager?.onRestoreInstanceState(recyclerViewState)
-        adapter = RemovedPasswordsListAdapter(mutPasswordsList, viewModel, requireContext())
+        adapter = RemovedPasswordsListAdapter(mutPasswordsList, viewModel, requireContext(), setAll)
         rV.adapter = adapter
     }
     /**
@@ -140,6 +143,7 @@ class RecycleBinFragment : Fragment(),
                 .collect {
                     binding.toolBar.menu.findItem(R.id.delete_passwords).isVisible = it
                     binding.toolBar.menu.findItem(R.id.recover_passwords).isVisible = it
+                    binding.toolBar.menu.findItem(R.id.select_all).isVisible = it
                     if (!it) viewModel.selectedPasswordsMMap.clear()
             }
         }

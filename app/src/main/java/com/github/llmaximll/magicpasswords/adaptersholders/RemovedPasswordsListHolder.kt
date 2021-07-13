@@ -32,15 +32,28 @@ class RemovedPasswordsListHolder(itemView: View, private val viewModel: RecycleB
         }
     }
 
-    fun bind(passwordInfo: PasswordInfo) {
+    fun bind(passwordInfo: PasswordInfo, position: Int) {
         this.passwordInfo = passwordInfo
         nameTextView.text = passwordInfo.name
         descriptionTextView.text = passwordInfo.description
         val calendar = Calendar.getInstance()
         calendar.time = Date(passwordInfo.removedDate)
         val currentCalendar = Calendar.getInstance()
-        val minutes = currentCalendar.get(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH)
-        dateTextView.text = "До удаления: ${30 - minutes} дней"
+        viewModel.selectedPasswordsMMap[position] = passwordInfo
+        when (passwordInfo.removedFormat) {
+            CommonFunctions.TimeDeleteDaySP -> {
+                val hours = currentCalendar.get(Calendar.HOUR_OF_DAY) - calendar.get(Calendar.HOUR_OF_DAY)
+                dateTextView.text = "До удаления: ${24 - hours} часов"
+            }
+            CommonFunctions.TimeDeleteWeakSP -> {
+                val days = currentCalendar.get(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH)
+                dateTextView.text = "До удаления: ${7 - days} дней"
+            }
+            CommonFunctions.TimeDeleteMonthSP -> {
+                val minutes = currentCalendar.get(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH)
+                dateTextView.text = "До удаления: ${30 - minutes} дней"
+            }
+        }
         if (viewModel.selected.value) {
             var checked = false
             for (key in viewModel.selectedPasswordsMMap.keys) {

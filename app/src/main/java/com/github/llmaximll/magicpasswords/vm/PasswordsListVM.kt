@@ -32,6 +32,12 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
         }
     }
 
+    fun deletePassword(password: PasswordInfo) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deletePasswordById(password.id)
+        }
+    }
+
     fun saveRecyclerViewState(mState: LinearLayoutManager.SavedState?) {
         savedStateHandle.set(KEY_RECYCLER_VIEW, mState)
     }

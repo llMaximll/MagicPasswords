@@ -26,6 +26,7 @@ class CommonFunctions private constructor() {
     val spPassword = "sp_password"
     val spFingerPrint = "sp_fingerprint"
     val spThemeApp = "sp_theme_app"
+    val spTimeDelete = "sp_time_delete"
 
     fun toast(context: Context, message: String) {
         Toast.makeText(
@@ -38,10 +39,12 @@ class CommonFunctions private constructor() {
         }
     }
 
-    fun snackBar(contextView: View, message: String, actionFunc: () -> Unit) {
+    fun snackBar(contextView: View, message: String, action: Boolean, actionFunc: () -> Unit? = {  }) {
         Snackbar.make(contextView, message, Snackbar.LENGTH_LONG).apply {
-            setAction("Отмена") {
-                actionFunc()
+            if (action) {
+                setAction("Отмена") {
+                    actionFunc()
+                }
             }
             show()
         }
@@ -139,8 +142,12 @@ class CommonFunctions private constructor() {
                 "CommonFunctions should be initialized"
             }
         }
-        const val SystemTheme = 0
-        const val LightTheme = 1
-        const val DarkTheme = 2
+        const val SystemThemeSP = 0
+        const val LightThemeSP = 1
+        const val DarkThemeSP = 2
+        const val TimeDeleteImmediatelySP = 0
+        const val TimeDeleteDaySP = 1
+        const val TimeDeleteWeakSP = 2
+        const val TimeDeleteMonthSP = 3
     }
 }

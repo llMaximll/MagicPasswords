@@ -3,46 +3,62 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/linearLayout">
+    android:layout_height="match_parent">
 
     <com.google.android.material.button.MaterialButton
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:id="@+id/system_theme_button"
+        android:id="@+id/immediately_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.15"
         android:padding="10dp"
         android:gravity="start|center"
-        android:text="Системная тема"
+        android:text="Удалять, минуя корзину"
         android:textColor="@color/text"
         android:textAllCaps="false"
         android:textSize="18sp"/>
 
     <com.google.android.material.button.MaterialButton
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:id="@+id/light_theme_button"
+        android:id="@+id/day_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.15"
         android:padding="10dp"
         android:gravity="start|center"
-        android:text="Светлая тема"
+        android:text="1 день"
         android:textColor="@color/text"
         android:textAllCaps="false"
         android:textSize="18sp"/>
 
     <com.google.android.material.button.MaterialButton
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:id="@+id/dark_theme_button"
+        android:id="@+id/weak_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.15"
         android:padding="10dp"
         android:gravity="start|center"
-        android:text="Темная тема"
+        android:text="1 неделя"
         android:textColor="@color/text"
         android:textAllCaps="false"
         android:textSize="18sp"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:id="@+id/month_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="start|center"
+        android:text="1 месяц"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="18sp"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="start|center"
+        android:hint="Изменения вступят в силу со следующим удалением" />
 
 </LinearLayout>

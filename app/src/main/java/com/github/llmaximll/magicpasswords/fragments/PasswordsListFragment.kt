@@ -99,30 +99,7 @@ class PasswordsListFragment : Fragment() {
             }
             true
         }
-//        binding.addPasswordFab.setOnClickListener {
-//            val fabImageView = binding.fabImageView
-//            val fab = binding.addPasswordFab
-//            val animatorX = ObjectAnimator.ofFloat(fabImageView, "scaleX", 30f)
-//            val animatorY = ObjectAnimator.ofFloat(fabImageView, "scaleY", 30f)
-//            val animatorXFab = ObjectAnimator.ofFloat(fab, "scaleX", 0f)
-//            val animatorYFab = ObjectAnimator.ofFloat(fab, "scaleY", 0f)
-//            val transitionDrawable = TransitionDrawable(arrayOf(ContextCompat.getDrawable(requireContext(), R.drawable.circle_blue), ContextCompat.getDrawable(requireContext(), R.drawable.circle_white)))
-//            fabImageView.background = transitionDrawable
-//            transitionDrawable.startTransition(400)
-//            fabImageView.animate().apply {
-//                translationZ(20f)
-//            }
-//            AnimatorSet().apply {
-//                playTogether(animatorX, animatorY, animatorXFab, animatorYFab)
-//                duration = 400L
-//                start()
-//            }.doOnEnd {
-//
-//            }
-//        }
     }
-
-
 
     override fun onPause() {
         super.onPause()

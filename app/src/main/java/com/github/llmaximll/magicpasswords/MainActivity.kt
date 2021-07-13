@@ -116,7 +116,8 @@ class MainActivity : AppCompatActivity(),
                 val password = binding.passwordEditText.text.toString()
                 val password2 = binding.passwordEditText2.text.toString()
                 val description = binding.descriptionEditText.text.toString()
-                if (name != "" || password != "" || password2 != "" || description != "") {
+                val address = binding.addressEditText.text.toString()
+                if (name != "" || password != "" || password2 != "" || description != "" || address != "") {
                     cf.toast(this, "Черновик сохранён")
                 }
                 replaceMainFragments(REPLACE_ON_PASSWORDS_LIST_FRAGMENT)
@@ -135,18 +136,22 @@ class MainActivity : AppCompatActivity(),
             val password = binding.passwordEditText.text.toString()
             val password2 = binding.passwordEditText2.text.toString()
             val description = binding.descriptionEditText.text.toString()
+            val address = binding.addressEditText.text.toString()
             if (viewModel.checkFields(this, name, password, password2, description)) {
                 viewModel.addPassword(
                     PasswordInfo(
                         name = name,
                         password = password,
-                        description = description
+                        description = description,
+                        address = address
                     )
                 )
                 binding.nameEditText.setText("")
                 binding.passwordEditText.setText("")
                 binding.passwordEditText2.setText("")
                 binding.descriptionEditText.setText("")
+                binding.addressEditText.setText("")
+                binding.passwordToggleCheckBox.isChecked = false
                 val startRadius = hypot(
                     binding.containerFragment.width.toDouble(),
                     binding.containerFragment.height.toDouble()

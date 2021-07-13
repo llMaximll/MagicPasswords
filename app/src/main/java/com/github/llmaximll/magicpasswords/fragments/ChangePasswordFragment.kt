@@ -68,23 +68,21 @@ class ChangePasswordFragment : Fragment(),
 
     override fun onStart() {
         super.onStart()
-        binding.okButton.setOnClickListener {
-                name = binding.nameEditText.text.toString()
-                password = binding.passwordEditText.text.toString()
-                val password2 = binding.passwordEditText2.text.toString()
-                description = binding.descriptionEditText.text.toString()
-            if (viewModel.checkFields(requireContext(), name, password, password2, description)) {
-                viewModel.addPassword(PasswordInfo(name = name, password = password, description = description))
-                callbacks?.onChangePasswordFragment()
-            }
-        }
         binding.changeButton.setOnClickListener {
             name = binding.nameEditText.text.toString()
             password = binding.passwordEditText.text.toString()
             val password2 = binding.passwordEditText2.text.toString()
             description = binding.descriptionEditText.text.toString()
+            val address = binding.addressEditText.text.toString()
             if (viewModel.checkFields(requireContext(), name, password, password2, description)) {
-                viewModel.updatePassword(PasswordInfo(id = idPassword, name = name, password = password, description = description))
+                viewModel.updatePassword(
+                    PasswordInfo(
+                        id = idPassword,
+                        name = name,
+                        password = password,
+                        description = description,
+                        address = address
+                    ))
                 callbacks?.onChangePasswordFragment()
             }
         }
@@ -129,18 +127,16 @@ class ChangePasswordFragment : Fragment(),
                     binding.passwordEditText.setText(it?.password)
                     binding.passwordEditText2.setText(it?.password)
                     binding.descriptionEditText.setText(it?.description)
+                    binding.addressEditText.setText(it?.address)
                 }
         }
-        binding.okButton.visibility = View.GONE
         binding.changeButton.visibility = View.VISIBLE
     }
 
     override fun onBackPressed(): Boolean {
         return if (this::idPassword.isInitialized) {
-            cf.log(TAG, "onBackPressed(Change) | true")
             true
         } else {
-            cf.log(TAG, "onBackPressed(Change) | false")
             (activity as? MainActivity)?.replaceMainFragments(MainActivity.REPLACE_ON_PASSWORDS_LIST_FRAGMENT)
             false
         }

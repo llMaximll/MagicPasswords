@@ -1,6 +1,7 @@
 package com.github.llmaximll.magicpasswords.adaptersholders
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +30,7 @@ class PasswordsListAdapter(
     private val workManager = WorkManager.getInstance(context)
     private var cf: CommonFunctions = CommonFunctions.get()
     private lateinit var view: View
+    private lateinit var sp: SharedPreferences
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PasswordsListHolder {
         view = LayoutInflater.from(parent.context)
@@ -47,29 +49,52 @@ class PasswordsListAdapter(
         val password = passwordsList[position]
         passwordsList.remove(password)
         notifyItemRemoved(position)
+        val deleteFormat = sp.getInt(cf.spTimeDelete, CommonFunctions.TimeDeleteMonthSP)
         password.removed = 1
         password.removedDate = Calendar.getInstance().timeInMillis
-        viewModel.updatePassword(password)
-        deletePasswordWorkManager(password.id.toString(), password.id.toString())
-        fun cancelSnackBar() {
-            password.removed = 0
+        password.removedFormat = deleteFormat
+        if (deleteFormat != CommonFunctions.TimeDeleteImmediatelySP) {
             viewModel.updatePassword(password)
-            workManager.cancelAllWorkByTag("${password.id}")
-            passwordsList.add(position, password)
-            notifyItemInserted(position)
+            deletePasswordWorkManager(password.id.toString(), password.id.toString())
+            fun cancelSnackBar() {
+                password.removed = 0
+                viewModel.updatePassword(password)
+                workManager.cancelAllWorkByTag("${password.id}")
+                passwordsList.add(position, password)
+                notifyItemInserted(position)
+            }
+            cf.snackBar(parentView, "Пароль удален", true) { cancelSnackBar() }
+        } else {
+            viewModel.deletePassword(password)
+            cf.snackBar(parentView, "Пароль удален", false)
         }
-        cf.snackBar(parentView, "Пароль удален") { cancelSnackBar() }
     }
 
     private fun deletePasswordWorkManager(passwordId: String, tag: String) {
+        val duration = sp.getInt(cf.spTimeDelete, CommonFunctions.TimeDeleteMonthSP)
         val myData = Data.Builder().apply {
             putString("passwordId", passwordId)
         }.build()
         val myWorkRequest = OneTimeWorkRequestBuilder<DeletePasswordWorker>().apply {
             addTag(tag)
             setInputData(myData)
-            setInitialDelay(30, TimeUnit.DAYS)
+            when (duration) {
+                CommonFunctions.TimeDeleteDaySP -> {
+                    setInitialDelay(24, TimeUnit.HOURS)
+                }
+                CommonFunctions.TimeDeleteWeakSP -> {
+                    setInitialDelay(7, TimeUnit.DAYS)
+                }
+                CommonFunctions.TimeDeleteMonthSP -> {
+                    setInitialDelay(30, TimeUnit.DAYS)
+                }
+            }
         }.build()
         workManager.enqueue(myWorkRequest)
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        sp = cf.getSharedPreferences(context)
     }
 }

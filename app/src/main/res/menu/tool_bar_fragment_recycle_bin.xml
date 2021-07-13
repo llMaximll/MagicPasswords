@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/select_all"
+        android:title="Выбрать всё"
+        android:icon="@drawable/ic_all"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
+    <item
         android:id="@+id/recover_passwords"
         android:title="Восстановить"
         android:icon="@drawable/ic_temporary_files"

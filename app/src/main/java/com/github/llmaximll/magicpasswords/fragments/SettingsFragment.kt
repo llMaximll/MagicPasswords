@@ -107,12 +107,15 @@ class SettingsFragment : Fragment(),
             viewModel.createBottomSheetDialogResetPass(requireContext(), binding.root)
         }
         binding.changeThemeButton.setOnClickListener {
-            viewModel.createBottomSheetDialogChangeTheme(requireContext(), binding.root, parentFragmentManager)
+            viewModel.createBottomSheetDialogChangeTheme(requireContext(), binding.root)
+        }
+        binding.timeDeleteButton.setOnClickListener {
+            viewModel.createBottomSheetDialogChangeTimeDelete(requireContext(), binding.root)
         }
     }
 
     private fun showFingerprint() {
-        lifecycleScope.launch(Dispatchers.Main) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
             biometricPrompt = BiometricPrompt(this@SettingsFragment,
                 object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationSucceeded(

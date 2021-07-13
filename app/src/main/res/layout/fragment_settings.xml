@@ -17,6 +17,18 @@
 
             <com.google.android.material.button.MaterialButton
                 style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/time_delete_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Время до удаления пароля"
+                android:padding="10dp"
+                android:gravity="start|center"
+                android:textColor="@color/text"
+                android:textAllCaps="false"
+                android:textSize="18sp"/>
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:id="@+id/change_theme_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
