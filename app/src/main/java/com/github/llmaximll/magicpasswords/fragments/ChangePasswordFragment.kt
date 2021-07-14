@@ -6,12 +6,14 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.github.llmaximll.magicpasswords.MainActivity
 import com.github.llmaximll.magicpasswords.OnBackPressedListener
+import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentChangePasswordBinding
@@ -40,6 +42,8 @@ class ChangePasswordFragment : Fragment(),
     private var name = ""
     private var password = ""
     private var description = ""
+    private var passwordFormat = PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
+    private var difficultPassword = 15
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,9 +100,32 @@ class ChangePasswordFragment : Fragment(),
             }
         }
         binding.generateButton.setOnClickListener {
-            val password = viewModel.generatePassword(10)
+            val password = viewModel.generatePassword(difficultPassword, passwordFormat)
             binding.passwordEditText.setText(password)
             binding.passwordEditText2.setText(password)
+        }
+        binding.difficultSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (progress != 0) {
+                    difficultPassword = progress
+                    val newPassword = viewModel.generatePassword(difficultPassword, passwordFormat)
+                    binding.countSymbolsTextView.hint = "Количество знаков: $progress"
+                    binding.passwordEditText.setText(newPassword)
+                    binding.passwordEditText2.setText(newPassword)
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+        })
+        binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.without_radioButton -> passwordFormat = PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
+                R.id.with_radioButton2 -> passwordFormat = PASSWORD_FORMAT_WITH_SPEC_SYMBOLS
+            }
         }
     }
 
@@ -152,5 +179,7 @@ class ChangePasswordFragment : Fragment(),
                 arguments = args
             }
         }
+        const val PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS = 0
+        const val PASSWORD_FORMAT_WITH_SPEC_SYMBOLS = 1
     }
 }

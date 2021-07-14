@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="350dp"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="center_horizontal"
+        android:text="Внимание!"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="24sp"
+        android:textStyle="bold"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="При выборе данной функции будут удалены все данные приложения"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="18sp"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="center"
+        android:text="Вы уверены?"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:textStyle="italic"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/yes_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:backgroundTint="#F36161"
+        android:text="Да"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:textStyle="bold|italic"/>
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:id="@+id/no_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="Нет"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="18sp"/>
+
+</LinearLayout>

@@ -10,13 +10,18 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.databinding.BottomSheetChangeTimeDeleteBinding
+import com.github.llmaximll.magicpasswords.databinding.DialogClearDatabaseBinding
 import com.github.llmaximll.magicpasswords.databinding.DialogDangerImmediatelyTimeBinding
+import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 
 class SettingsVM : ViewModel() {
@@ -24,6 +29,7 @@ class SettingsVM : ViewModel() {
     private lateinit var oldPassword2: String
     private lateinit var deleteFormatDialog: Dialog
     private val cf = CommonFunctions.get()
+    private val repository = MagicRepository.get()
     private val changeThemeDataFlow = MutableStateFlow<Int?>(null)
     val changeThemeFlow = changeThemeDataFlow.asStateFlow()
 
@@ -166,6 +172,31 @@ class SettingsVM : ViewModel() {
             editor.apply()
             dialog.dismiss()
             deleteFormatDialog.dismiss()
+        }
+
+        binding.noButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
+    fun showClearDatabaseDialog(context: Context, rootView: ViewGroup) {
+        val dialog = Dialog(context)
+        val view = LayoutInflater
+            .from(context).inflate(
+                R.layout.dialog_clear_database,
+                rootView,
+                false
+            )
+        val binding = DialogClearDatabaseBinding.bind(view)
+
+        binding.yesButton.setOnClickListener {
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.clearAllDatabase()
+            }
+            dialog.dismiss()
         }
 
         binding.noButton.setOnClickListener {

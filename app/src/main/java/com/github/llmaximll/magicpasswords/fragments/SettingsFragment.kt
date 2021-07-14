@@ -112,6 +112,9 @@ class SettingsFragment : Fragment(),
         binding.timeDeleteButton.setOnClickListener {
             viewModel.createBottomSheetDialogChangeTimeDelete(requireContext(), binding.root)
         }
+        binding.clearDatabaseButton.setOnClickListener {
+            viewModel.showClearDatabaseDialog(requireContext(), binding.root)
+        }
     }
 
     private fun showFingerprint() {

@@ -2,6 +2,7 @@ package com.github.llmaximll.magicpasswords.common
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log

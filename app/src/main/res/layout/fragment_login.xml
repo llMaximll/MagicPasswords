@@ -248,7 +248,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="#00FFFFFF"
-        android:src="@drawable/ic_delete"
+        android:src="@drawable/ic_delete_symbol"
         android:visibility="gone"
         app:layout_constraintStart_toEndOf="@id/number_0_button"
         app:layout_constraintTop_toTopOf="@id/guideline2"

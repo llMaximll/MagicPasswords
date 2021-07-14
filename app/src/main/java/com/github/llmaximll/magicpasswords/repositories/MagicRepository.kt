@@ -44,6 +44,10 @@ class MagicRepository private constructor(context: Context) {
         magicDao.deletePasswordById(passwordId)
     }
 
+    fun clearAllDatabase() {
+        database.clearAllTables()
+    }
+
     companion object {
         private var INSTANCE: MagicRepository? = null
         fun initialize(context: Context) {

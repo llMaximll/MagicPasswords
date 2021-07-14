@@ -78,6 +78,18 @@
                 android:textAllCaps="false"
                 android:textSize="18sp"/>
 
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/clear_database_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:gravity="start|center"
+                android:text="Очистить данные"
+                android:textColor="@color/text"
+                android:textAllCaps="false"
+                android:textSize="18sp"/>
+
         </LinearLayout>
 
     </ScrollView>
