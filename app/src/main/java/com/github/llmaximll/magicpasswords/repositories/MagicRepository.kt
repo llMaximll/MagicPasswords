@@ -2,8 +2,10 @@ package com.github.llmaximll.magicpasswords.repositories
 
 import android.content.Context
 import androidx.room.Room
+import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.database.MagicDatabase
+import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
 import java.util.*
 
 private const val DATABASE_NAME = "MagicDatabase"
@@ -17,6 +19,42 @@ class MagicRepository private constructor(context: Context) {
     ).build()
 
     private val magicDao = database.magicDao()
+
+    fun generateSecretKey(context: Context) {
+        val cf = CommonFunctions.get()
+        val sp = cf.getSharedPreferences(context)
+        val secretKey: String? = sp.getString(cf.spSecretKey, null)
+        if (secretKey == null) {
+            val editor = sp.edit()
+            editor.putString(
+                cf.spSecretKey,
+                generatePassword(45, ChangePasswordFragment.PASSWORD_FORMAT_WITH_SPEC_SYMBOLS)
+            )
+            editor.apply()
+        }
+    }
+
+    fun generatePassword(
+        count: Int,
+        passwordFormat: Int = ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
+    ): String {
+        val dict = when (passwordFormat) {
+            ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS -> {
+                "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            }
+            ChangePasswordFragment.PASSWORD_FORMAT_WITH_SPEC_SYMBOLS -> {
+                "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\\/^&%$#@_-"
+            } else -> {
+                "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            }
+        }
+        val rnd = Random()
+        val password = StringBuilder()
+        for (i in 0..count) {
+            password.append(dict[rnd.nextInt(dict.length)])
+        }
+        return password.toString()
+    }
 
     suspend fun getAllPasswords(removed: Int = 0): List<PasswordInfo> =
         magicDao.getAllPasswords(removed)

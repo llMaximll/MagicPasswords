@@ -72,8 +72,10 @@ class ChangePasswordVM : ViewModel() {
         return true
     }
 
-    fun generatePassword(count: Int, passwordFormat: Int = ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS): String {
-        //Без спец. знаков
+    fun generatePassword(
+        count: Int,
+        passwordFormat: Int = ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
+    ): String {
         val dict = when (passwordFormat) {
             ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS -> {
                 "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"

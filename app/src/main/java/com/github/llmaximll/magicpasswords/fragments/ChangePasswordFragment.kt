@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.github.llmaximll.magicpasswords.Encryption
 import com.github.llmaximll.magicpasswords.MainActivity
 import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
@@ -18,8 +19,10 @@ import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentChangePasswordBinding
 import com.github.llmaximll.magicpasswords.vm.ChangePasswordVM
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 private const val TAG = "ChangePasswordFragment"
@@ -100,9 +103,23 @@ class ChangePasswordFragment : Fragment(),
             }
         }
         binding.generateButton.setOnClickListener {
-            val password = viewModel.generatePassword(difficultPassword, passwordFormat)
-            binding.passwordEditText.setText(password)
-            binding.passwordEditText2.setText(password)
+            if (!binding.messageRadioButton.isChecked) {
+                val password = viewModel.generatePassword(difficultPassword, passwordFormat)
+                binding.passwordEditText.setText(password)
+                binding.passwordEditText2.setText(password)
+            } else {
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    val enc = Encryption()
+                    val newPassword = enc.encrypt(binding.messageEditText2.text.toString(), requireContext())
+                    withContext(Dispatchers.Main) {
+                        binding.passwordEditText.setText("$newPassword")
+                        binding.passwordEditText2.setText("$newPassword")
+                        difficultPassword = newPassword?.length ?: 0
+                        binding.countSymbolsTextView.hint = "Количество знаков: ${newPassword?.length}"
+                        binding.difficultSeekBar.progress = difficultPassword
+                    }
+                }
+            }
         }
         binding.difficultSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -123,8 +140,22 @@ class ChangePasswordFragment : Fragment(),
         })
         binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.without_radioButton -> passwordFormat = PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
-                R.id.with_radioButton2 -> passwordFormat = PASSWORD_FORMAT_WITH_SPEC_SYMBOLS
+                R.id.without_radioButton -> {
+                    passwordFormat = PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
+                    binding.messageInputLayout.isEnabled = false
+                    binding.difficultSeekBar.isEnabled = true
+                    binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
+                }
+                R.id.with_radioButton2 -> {
+                    passwordFormat = PASSWORD_FORMAT_WITH_SPEC_SYMBOLS
+                    binding.messageInputLayout.isEnabled = false
+                    binding.difficultSeekBar.isEnabled = true
+                    binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
+                }
+                R.id.message_radioButton -> {
+                    binding.messageInputLayout.isEnabled = true
+                    binding.difficultSeekBar.isEnabled = false
+                }
             }
         }
     }
@@ -137,6 +168,8 @@ class ChangePasswordFragment : Fragment(),
         }
         //transition
         binding.scrollView.transitionName = transitionName
+        //Другое
+        binding.withoutRadioButton.isChecked = true
     }
 
     override fun onDetach() {
@@ -155,6 +188,9 @@ class ChangePasswordFragment : Fragment(),
                     binding.passwordEditText2.setText(it?.password)
                     binding.descriptionEditText.setText(it?.description)
                     binding.addressEditText.setText(it?.address)
+                    difficultPassword = it?.password?.length ?: 0
+                    binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
+                    binding.difficultSeekBar.progress = difficultPassword
                 }
         }
         binding.changeButton.visibility = View.VISIBLE

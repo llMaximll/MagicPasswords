@@ -9,5 +9,7 @@ class MagicPasswordsApplication : Application() {
         super.onCreate()
         CommonFunctions.init()
         MagicRepository.initialize(this)
+        val repository = MagicRepository.get()
+        repository.generateSecretKey(this)
     }
 }

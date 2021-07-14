@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.InputType
 import android.view.View
 import android.view.ViewAnimationUtils
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.fragment.app.Fragment
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity(),
      * В зависимости от [changeValue] будет показан либо список паролей, либо создание пароля
      */
     private var changeValue = false
+    private var passwordFormat = ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
+    private var difficultPassword = 15
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +63,7 @@ class MainActivity : AppCompatActivity(),
             View.VISIBLE else
             View.GONE
         setButtons()
+        binding.withoutRadioButton.isChecked = true
     }
 
     override fun onPasswordsListFragment(fragment: String, idPassword: String, sharedView: View?) {
@@ -184,9 +188,34 @@ class MainActivity : AppCompatActivity(),
             }
         }
         binding.generateButton.setOnClickListener {
-            val password = viewModel.generatePassword(10)
+            val password = viewModel.generatePassword(difficultPassword, passwordFormat)
             binding.passwordEditText.setText(password)
             binding.passwordEditText2.setText(password)
+        }
+        binding.difficultSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (progress != 0) {
+                    difficultPassword = progress
+                    val newPassword = viewModel.generatePassword(difficultPassword, passwordFormat)
+                    binding.countSymbolsTextView.hint = "Количество знаков: $progress"
+                    binding.passwordEditText.setText(newPassword)
+                    binding.passwordEditText2.setText(newPassword)
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+        })
+        binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.without_radioButton -> passwordFormat =
+                    ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
+                R.id.with_radioButton2 -> passwordFormat =
+                    ChangePasswordFragment.PASSWORD_FORMAT_WITH_SPEC_SYMBOLS
+            }
         }
     }
 

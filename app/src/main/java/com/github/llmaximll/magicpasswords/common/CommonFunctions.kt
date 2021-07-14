@@ -28,6 +28,7 @@ class CommonFunctions private constructor() {
     val spFingerPrint = "sp_fingerprint"
     val spThemeApp = "sp_theme_app"
     val spTimeDelete = "sp_time_delete"
+    val spSecretKey = "sp_secret_key"
 
     fun toast(context: Context, message: String) {
         Toast.makeText(
