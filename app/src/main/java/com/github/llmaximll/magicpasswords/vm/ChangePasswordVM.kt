@@ -43,9 +43,7 @@ class ChangePasswordVM : ViewModel() {
         context: Context,
         name: String,
         password: String,
-        password2:
-        String,
-        description: String
+        password2: String
     ): Boolean {
         when {
             name.isEmpty() -> {
@@ -58,10 +56,6 @@ class ChangePasswordVM : ViewModel() {
             }
             password2.isEmpty() -> {
                 cf.toast(context,"Поле \"Пароль 2\" пустое")
-                return false
-            }
-            description.isEmpty() -> {
-                cf.toast(context,"Поле \"Описание\" пустое")
                 return false
             }
         }

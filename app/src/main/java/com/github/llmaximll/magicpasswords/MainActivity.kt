@@ -8,6 +8,7 @@ import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.transition.TransitionInflater
 import com.github.llmaximll.magicpasswords.common.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
@@ -17,6 +18,9 @@ import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
 import com.github.llmaximll.magicpasswords.fragments.RecycleBinFragment
 import com.github.llmaximll.magicpasswords.fragments.SettingsFragment
 import com.github.llmaximll.magicpasswords.vm.MainActivityVM
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.hypot
 
 private const val KEY_CHANGE_VALUE = "key_change_value"
@@ -141,13 +145,14 @@ class MainActivity : AppCompatActivity(),
             val password2 = binding.passwordEditText2.text.toString()
             val description = binding.descriptionEditText.text.toString()
             val address = binding.addressEditText.text.toString()
-            if (viewModel.checkFields(this, name, password, password2, description)) {
+            if (viewModel.checkFields(this, name, password, password2)) {
                 viewModel.addPassword(
                     PasswordInfo(
                         name = name,
                         password = password,
                         description = description,
-                        address = address
+                        address = address,
+                        messagePassword = binding.messageRadioButton.isChecked
                     )
                 )
                 binding.nameEditText.setText("")
@@ -156,6 +161,11 @@ class MainActivity : AppCompatActivity(),
                 binding.descriptionEditText.setText("")
                 binding.addressEditText.setText("")
                 binding.passwordToggleCheckBox.isChecked = false
+                binding.withoutRadioButton.isChecked = true
+                binding.messageEditText2.setText("")
+                difficultPassword = 15
+                binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
+                binding.difficultSeekBar.progress = difficultPassword
                 val startRadius = hypot(
                     binding.containerFragment.width.toDouble(),
                     binding.containerFragment.height.toDouble()
@@ -188,9 +198,23 @@ class MainActivity : AppCompatActivity(),
             }
         }
         binding.generateButton.setOnClickListener {
-            val password = viewModel.generatePassword(difficultPassword, passwordFormat)
-            binding.passwordEditText.setText(password)
-            binding.passwordEditText2.setText(password)
+            if (!binding.messageRadioButton.isChecked) {
+                val password = viewModel.generatePassword(difficultPassword, passwordFormat)
+                binding.passwordEditText.setText(password)
+                binding.passwordEditText2.setText(password)
+            } else {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val enc = Encryption()
+                    val newPassword = enc.encrypt(binding.messageEditText2.text.toString(), this@MainActivity)
+                    withContext(Dispatchers.Main) {
+                        binding.passwordEditText.setText("$newPassword")
+                        binding.passwordEditText2.setText("$newPassword")
+                        difficultPassword = newPassword?.length ?: 0
+                        binding.countSymbolsTextView.hint = "Количество знаков: ${newPassword?.length}"
+                        binding.difficultSeekBar.progress = difficultPassword
+                    }
+                }
+            }
         }
         binding.difficultSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -211,10 +235,28 @@ class MainActivity : AppCompatActivity(),
         })
         binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.without_radioButton -> passwordFormat =
-                    ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
-                R.id.with_radioButton2 -> passwordFormat =
-                    ChangePasswordFragment.PASSWORD_FORMAT_WITH_SPEC_SYMBOLS
+                R.id.without_radioButton -> {
+                    passwordFormat = ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
+                    binding.messageInputLayout.isEnabled = false
+                    binding.difficultSeekBar.isEnabled = true
+                    binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
+                    binding.passwordEditText.isEnabled = true
+                    binding.passwordEditText2.isEnabled = true
+                }
+                R.id.with_radioButton2 -> {
+                    passwordFormat = ChangePasswordFragment.PASSWORD_FORMAT_WITH_SPEC_SYMBOLS
+                    binding.messageInputLayout.isEnabled = false
+                    binding.difficultSeekBar.isEnabled = true
+                    binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
+                    binding.passwordEditText.isEnabled = true
+                    binding.passwordEditText2.isEnabled = true
+                }
+                R.id.message_radioButton -> {
+                    binding.messageInputLayout.isEnabled = true
+                    binding.difficultSeekBar.isEnabled = false
+                    binding.passwordEditText.isEnabled = false
+                    binding.passwordEditText2.isEnabled = false
+                }
             }
         }
     }

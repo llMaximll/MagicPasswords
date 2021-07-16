@@ -81,14 +81,15 @@ class ChangePasswordFragment : Fragment(),
             val password2 = binding.passwordEditText2.text.toString()
             description = binding.descriptionEditText.text.toString()
             val address = binding.addressEditText.text.toString()
-            if (viewModel.checkFields(requireContext(), name, password, password2, description)) {
+            if (viewModel.checkFields(requireContext(), name, password, password2)) {
                 viewModel.updatePassword(
                     PasswordInfo(
                         id = idPassword,
                         name = name,
                         password = password,
                         description = description,
-                        address = address
+                        address = address,
+                        messagePassword = binding.messageRadioButton.isChecked
                     ))
                 callbacks?.onChangePasswordFragment()
             }
@@ -145,16 +146,22 @@ class ChangePasswordFragment : Fragment(),
                     binding.messageInputLayout.isEnabled = false
                     binding.difficultSeekBar.isEnabled = true
                     binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
+                    binding.passwordEditText.isEnabled = true
+                    binding.passwordEditText2.isEnabled = true
                 }
                 R.id.with_radioButton2 -> {
                     passwordFormat = PASSWORD_FORMAT_WITH_SPEC_SYMBOLS
                     binding.messageInputLayout.isEnabled = false
                     binding.difficultSeekBar.isEnabled = true
                     binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
+                    binding.passwordEditText.isEnabled = true
+                    binding.passwordEditText2.isEnabled = true
                 }
                 R.id.message_radioButton -> {
                     binding.messageInputLayout.isEnabled = true
                     binding.difficultSeekBar.isEnabled = false
+                    binding.passwordEditText.isEnabled = false
+                    binding.passwordEditText2.isEnabled = false
                 }
             }
         }
@@ -190,7 +197,11 @@ class ChangePasswordFragment : Fragment(),
                     binding.addressEditText.setText(it?.address)
                     difficultPassword = it?.password?.length ?: 0
                     binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
-                    binding.difficultSeekBar.progress = difficultPassword
+                    if (it?.messagePassword == true) {
+                        binding.messageRadioButton.isChecked = true
+                        val en = Encryption()
+                        binding.messageEditText2.setText(en.decrypt(it.password, requireContext()))
+                    }
                 }
         }
         binding.changeButton.visibility = View.VISIBLE

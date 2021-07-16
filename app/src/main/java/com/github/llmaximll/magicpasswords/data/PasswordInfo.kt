@@ -14,5 +14,6 @@ data class PasswordInfo(
     val description: String = "",
     var removed: Int = 0,
     var removedDate: Long = 0L,
-    var removedFormat: Int = CommonFunctions.TimeDeleteMonthSP
+    var removedFormat: Int = CommonFunctions.TimeDeleteMonthSP,
+    var messagePassword: Boolean = false
 )
