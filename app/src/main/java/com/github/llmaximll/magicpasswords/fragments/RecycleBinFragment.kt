@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.adaptersholders.RemovedPasswordsListAdapter
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentRecycleBinBinding
 import com.github.llmaximll.magicpasswords.vm.RecycleBinVM

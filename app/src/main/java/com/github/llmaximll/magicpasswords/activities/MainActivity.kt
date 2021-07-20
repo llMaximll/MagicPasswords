@@ -1,26 +1,38 @@
-package com.github.llmaximll.magicpasswords
+package com.github.llmaximll.magicpasswords.activities
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.widget.SeekBar
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.TransitionInflater
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.Encryption
+import com.github.llmaximll.magicpasswords.OnBackPressedListener
+import com.github.llmaximll.magicpasswords.R
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.ActivityMainBinding
 import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
 import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
 import com.github.llmaximll.magicpasswords.fragments.RecycleBinFragment
 import com.github.llmaximll.magicpasswords.fragments.SettingsFragment
+import com.github.llmaximll.magicpasswords.utils.StorageUtils
 import com.github.llmaximll.magicpasswords.vm.MainActivityVM
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.math.hypot
 
 private const val KEY_CHANGE_VALUE = "key_change_value"
@@ -33,6 +45,8 @@ class MainActivity : AppCompatActivity(),
     private lateinit var cf: CommonFunctions
     private lateinit var viewModel: MainActivityVM
     private lateinit var passwordsFragment: Fragment
+    lateinit var createDocumentIntent: Intent
+    lateinit var createDocumentResultLauncher: ActivityResultLauncher<Intent>
     /**
      * В зависимости от [changeValue] будет показан либо список паролей, либо создание пароля
      */
@@ -68,6 +82,46 @@ class MainActivity : AppCompatActivity(),
             View.GONE
         setButtons()
         binding.withoutRadioButton.isChecked = true
+        // Регистрация activity
+        createDocumentIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TITLE, "backup.txt")
+        }
+        createDocumentResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val text = viewModel.getAllPasswords()
+                        val gson = GsonBuilder().create()
+                        val en = Encryption()
+                        val file = if (sp.getBoolean(cf.spBackupEncryption, true)) {
+                            en.encrypt(gson.toJson(text), this@MainActivity)
+                        } else {
+                            gson.toJson(text)
+                        }
+                        if (file != null) {
+                            result.data.also { intent ->
+                                if (intent != null) {
+                                    val path = "/storage/emulated/0/${intent.data?.path?.drop(18)}"
+                                    StorageUtils.setTextInStorage(
+                                        rootDestination = File(path),
+                                        context = this@MainActivity,
+                                        fileName = null,
+                                        folderName = null,
+                                        text = file
+                                    )
+                                }
+                            }
+                        } else {
+                            cf.toast(
+                                this@MainActivity,
+                                "Ошибка при создании резервной копии"
+                            )
+                        }
+                    }
+                }
+            }
     }
 
     override fun onPasswordsListFragment(fragment: String, idPassword: String, sharedView: View?) {

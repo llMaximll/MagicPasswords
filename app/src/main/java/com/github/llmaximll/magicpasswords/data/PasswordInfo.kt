@@ -2,7 +2,7 @@ package com.github.llmaximll.magicpasswords.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import java.util.*
 
 @Entity

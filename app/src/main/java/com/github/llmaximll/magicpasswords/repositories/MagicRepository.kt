@@ -2,7 +2,7 @@ package com.github.llmaximll.magicpasswords.repositories
 
 import android.content.Context
 import androidx.room.Room
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.database.MagicDatabase
 import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment

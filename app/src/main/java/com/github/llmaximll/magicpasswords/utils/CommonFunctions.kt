@@ -1,8 +1,7 @@
-package com.github.llmaximll.magicpasswords.common
+package com.github.llmaximll.magicpasswords.utils
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
@@ -29,6 +28,7 @@ class CommonFunctions private constructor() {
     val spThemeApp = "sp_theme_app"
     val spTimeDelete = "sp_time_delete"
     val spSecretKey = "sp_secret_key"
+    val spBackupEncryption = "sp_backup_encryption"
 
     fun toast(context: Context, message: String) {
         Toast.makeText(

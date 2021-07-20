@@ -2,7 +2,7 @@ package com.github.llmaximll.magicpasswords
 
 import android.content.Context
 import android.util.Base64
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec

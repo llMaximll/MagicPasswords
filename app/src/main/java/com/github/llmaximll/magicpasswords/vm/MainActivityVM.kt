@@ -3,7 +3,7 @@ package com.github.llmaximll.magicpasswords.vm
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
@@ -27,6 +27,10 @@ class MainActivityVM : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updatePassword(passwordInfo)
         }
+    }
+
+    suspend fun getAllPasswords(): List<PasswordInfo> {
+        return repository.getAllPasswords(0)
     }
 
     fun checkFields(

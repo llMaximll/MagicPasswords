@@ -3,8 +3,7 @@ package com.github.llmaximll.magicpasswords.background
 import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import java.util.*
 

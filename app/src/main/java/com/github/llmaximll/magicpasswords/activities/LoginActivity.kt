@@ -1,10 +1,11 @@
-package com.github.llmaximll.magicpasswords
+package com.github.llmaximll.magicpasswords.activities
 
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.R
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.databinding.ActivityLoginBinding
 import com.github.llmaximll.magicpasswords.fragments.LoginFragment
 

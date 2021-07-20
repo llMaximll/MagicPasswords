@@ -1,14 +1,13 @@
 package com.github.llmaximll.magicpasswords.adaptersholders
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.WorkManager
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.vm.RecycleBinVM
 import kotlinx.coroutines.CoroutineScope

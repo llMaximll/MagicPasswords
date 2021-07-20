@@ -17,11 +17,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionInflater
-import com.github.llmaximll.magicpasswords.MainActivity
+import com.github.llmaximll.magicpasswords.activities.MainActivity
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.adaptersholders.PasswordsListAdapter
 import com.github.llmaximll.magicpasswords.adaptersholders.SimpleItemTouchHelperCallback
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentPasswordsListBinding
 import com.github.llmaximll.magicpasswords.vm.PasswordsListVM

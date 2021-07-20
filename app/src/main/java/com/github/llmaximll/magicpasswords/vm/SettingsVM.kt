@@ -1,28 +1,41 @@
 package com.github.llmaximll.magicpasswords.vm
 
+import android.Manifest
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.llmaximll.magicpasswords.Encryption
+import com.github.llmaximll.magicpasswords.activities.MainActivity
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.BottomSheetChangeTimeDeleteBinding
+import com.github.llmaximll.magicpasswords.databinding.DialogBackupBinding
 import com.github.llmaximll.magicpasswords.databinding.DialogClearDatabaseBinding
 import com.github.llmaximll.magicpasswords.databinding.DialogDangerImmediatelyTimeBinding
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.StorageUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
+private const val WRITE_EXTERNAL_STORAGE_REQUEST_PERMISSION = 1
 
 class SettingsVM : ViewModel() {
     private lateinit var sp: SharedPreferences
@@ -41,6 +54,8 @@ class SettingsVM : ViewModel() {
         sp = cf.getSharedPreferences(context)
         oldPassword2 = sp.getString(cf.spPassword, "null") ?: "null"
     }
+
+    private suspend fun getAllPasswords(): List<PasswordInfo> = repository.getAllPasswords(0)
 
     private fun saveNewPassword(newPassword: String) {
         val editor = sp.edit()
@@ -205,6 +220,61 @@ class SettingsVM : ViewModel() {
 
         dialog.setContentView(view)
         dialog.show()
+    }
+
+    fun showBackupDialog(context: Context, activity: MainActivity, rootView: ViewGroup) {
+        val dialog = Dialog(context)
+        val view = LayoutInflater
+            .from(context).inflate(
+                R.layout.dialog_backup,
+                rootView,
+                false
+            )
+        val binding = DialogBackupBinding.bind(view)
+
+        binding.yesButton.setOnClickListener {
+            val cf = CommonFunctions.get()
+            val sp = cf.getSharedPreferences(context)
+            val editor = sp.edit()
+            editor.putBoolean(cf.spBackupEncryption, true)
+            editor.apply()
+            backupPasswords(context, activity)
+            dialog.dismiss()
+        }
+
+        binding.noButton.setOnClickListener {
+            val cf = CommonFunctions.get()
+            val sp = cf.getSharedPreferences(context)
+            val editor = sp.edit()
+            editor.putBoolean(cf.spBackupEncryption, false)
+            editor.apply()
+            backupPasswords(context, activity)
+            dialog.dismiss()
+        }
+
+        dialog.setContentView(binding.root)
+        dialog.show()
+    }
+
+    private fun backupPasswords(context: Context, activity: MainActivity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                    if (StorageUtils.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        activity.createDocumentResultLauncher.launch(activity.createDocumentIntent)
+                    } else {
+                        val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        StorageUtils.requestPermissions(
+                            activity,
+                            permissions,
+                            WRITE_EXTERNAL_STORAGE_REQUEST_PERMISSION
+                        )
+                    }
+                } else {
+                    activity.createDocumentResultLauncher.launch(activity.createDocumentIntent)
+                }
+            }
+        }
     }
 
     private fun checkFields(

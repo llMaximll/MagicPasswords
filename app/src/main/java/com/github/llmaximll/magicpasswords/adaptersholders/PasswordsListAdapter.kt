@@ -11,7 +11,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.background.DeletePasswordWorker
-import com.github.llmaximll.magicpasswords.common.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
 import com.github.llmaximll.magicpasswords.vm.PasswordsListVM
