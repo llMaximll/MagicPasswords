@@ -2,10 +2,10 @@ package com.github.llmaximll.magicpasswords.repositories
 
 import android.content.Context
 import androidx.room.Room
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.database.MagicDatabase
 import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import java.util.*
 
 private const val DATABASE_NAME = "MagicDatabase"
@@ -64,6 +64,10 @@ class MagicRepository private constructor(context: Context) {
 
     fun addPassword(passwordInfo: PasswordInfo) {
         magicDao.addPassword(passwordInfo)
+    }
+
+    fun addAllPasswords(passwordsList: List<PasswordInfo>) {
+        magicDao.addAllPasswords(passwordsList)
     }
 
     fun updatePassword(passwordInfo: PasswordInfo) {

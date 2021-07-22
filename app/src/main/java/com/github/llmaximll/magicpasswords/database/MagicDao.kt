@@ -12,8 +12,11 @@ interface MagicDao {
     @Query("SELECT * FROM PasswordInfo WHERE id=(:idPassword)")
     suspend fun getPasswordInfo(idPassword: UUID): PasswordInfo
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addPassword(passwordInfo: PasswordInfo)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addAllPasswords(passwordsList: List<PasswordInfo>)
 
     @Update
     fun updatePassword(passwordInfo: PasswordInfo)

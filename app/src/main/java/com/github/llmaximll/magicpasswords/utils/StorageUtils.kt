@@ -68,12 +68,16 @@ object StorageUtils {
     }
 
     fun getTextFromStorage(
-        rootDestination: File,
+        rootDestination: File = File("/storage/emulated/0/"),
         context: Context,
-        fileName: String,
-        folderName: String
+        fileName: String?,
+        folderName: String?
     ): String {
-        val file = createOrGetFile(rootDestination, fileName, folderName)
+        val file = if (fileName != null && folderName != null) {
+            createOrGetFile(rootDestination, fileName, folderName)
+        } else {
+            File(rootDestination.path)
+        }
         return readFile(context, file)
     }
 

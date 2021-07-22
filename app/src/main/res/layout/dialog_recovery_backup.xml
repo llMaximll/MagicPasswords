@@ -12,20 +12,32 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:gravity="center_horizontal"
-        android:text="Шифрование"
+        android:text="Восстановление"
         android:textColor="@color/text"
         android:textAllCaps="false"
         android:textSize="24sp"
         android:textStyle="bold"/>
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/count_passwords_textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="Зашифровать резервную копию для обеспечения конфиденциальности?"
+        android:text="Найдено: 0 паролей."
         android:textColor="@color/text"
         android:textAllCaps="false"
         android:textSize="18sp"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="center"
+        android:text="Добавить их в приложение?"
+        android:textColor="@color/text"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:textStyle="italic"/>
 
     <com.google.android.material.button.MaterialButton
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -39,25 +51,14 @@
         android:textSize="18sp"/>
 
     <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:id="@+id/no_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:backgroundTint="#F36161"
         android:text="Нет"
         android:textColor="@color/text"
         android:textAllCaps="false"
-        android:textSize="18sp"
-        android:textStyle="bold|italic"/>
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/recovery_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:hint="Восстановление данных из резервной копии"
-        android:textColorHint="#10548E"
-        android:textAllCaps="false"
-        android:textSize="18sp"/>
+        android:textSize="18sp" />
 
 </LinearLayout>

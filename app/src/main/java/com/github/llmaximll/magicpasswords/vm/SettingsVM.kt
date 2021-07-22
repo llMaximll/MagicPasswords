@@ -1,24 +1,19 @@
 package com.github.llmaximll.magicpasswords.vm
 
 import android.Manifest
-import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
-import android.provider.DocumentsContract
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.llmaximll.magicpasswords.Encryption
-import com.github.llmaximll.magicpasswords.activities.MainActivity
 import com.github.llmaximll.magicpasswords.R
+import com.github.llmaximll.magicpasswords.activities.MainActivity
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.BottomSheetChangeTimeDeleteBinding
 import com.github.llmaximll.magicpasswords.databinding.DialogBackupBinding
@@ -28,7 +23,6 @@ import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.utils.StorageUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -250,6 +244,11 @@ class SettingsVM : ViewModel() {
             editor.apply()
             backupPasswords(context, activity)
             dialog.dismiss()
+        }
+
+        binding.recoveryTextView.setOnClickListener {
+            dialog.dismiss()
+            activity.openDocumentResultLauncher.launch(activity.openDocumentIntent)
         }
 
         dialog.setContentView(binding.root)

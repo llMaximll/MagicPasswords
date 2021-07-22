@@ -10,11 +10,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.github.llmaximll.magicpasswords.activities.MainActivity
 import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.activities.MainActivity
 import com.github.llmaximll.magicpasswords.databinding.FragmentSettingsBinding
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.vm.SettingsVM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect

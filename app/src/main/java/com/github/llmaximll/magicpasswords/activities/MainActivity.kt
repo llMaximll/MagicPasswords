@@ -2,7 +2,6 @@ package com.github.llmaximll.magicpasswords.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
@@ -18,23 +17,27 @@ import androidx.transition.TransitionInflater
 import com.github.llmaximll.magicpasswords.Encryption
 import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.ActivityMainBinding
 import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
 import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
 import com.github.llmaximll.magicpasswords.fragments.RecycleBinFragment
 import com.github.llmaximll.magicpasswords.fragments.SettingsFragment
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.utils.StorageUtils
 import com.github.llmaximll.magicpasswords.vm.MainActivityVM
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonParseException
+import com.google.gson.JsonSyntaxException
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.lang.reflect.Type
 import kotlin.math.hypot
 
+private const val TAG = "MainActivity"
 private const val KEY_CHANGE_VALUE = "key_change_value"
 
 class MainActivity : AppCompatActivity(),
@@ -47,6 +50,8 @@ class MainActivity : AppCompatActivity(),
     private lateinit var passwordsFragment: Fragment
     lateinit var createDocumentIntent: Intent
     lateinit var createDocumentResultLauncher: ActivityResultLauncher<Intent>
+    lateinit var openDocumentIntent: Intent
+    lateinit var openDocumentResultLauncher: ActivityResultLauncher<Intent>
     /**
      * В зависимости от [changeValue] будет показан либо список паролей, либо создание пароля
      */
@@ -86,7 +91,7 @@ class MainActivity : AppCompatActivity(),
         createDocumentIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "text/plain"
-            putExtra(Intent.EXTRA_TITLE, "backup.txt")
+            putExtra(Intent.EXTRA_TITLE, "MagicPasswordsBackup.txt")
         }
         createDocumentResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -118,6 +123,42 @@ class MainActivity : AppCompatActivity(),
                                 this@MainActivity,
                                 "Ошибка при создании резервной копии"
                             )
+                        }
+                    }
+                }
+            }
+        openDocumentIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TITLE, "MagicPasswordsBackup.txt")
+        }
+        openDocumentResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data.also { intent ->
+                        if (intent != null) {
+                            val file =
+                                StorageUtils.getTextFromStorage(
+                                    rootDestination = File(
+                                        "/storage/emulated/0/${intent.data?.path?.drop(18)}"),
+                                    context = this@MainActivity,
+                                    fileName = null,
+                                    folderName = null
+                                )
+                            val gson = GsonBuilder().create()
+                            val collectionType: Type =
+                                object : TypeToken<List<PasswordInfo>>() {}.type
+                            try {
+                                val passwordsList: List<PasswordInfo> = gson.fromJson(file, collectionType)
+                                viewModel.showRecoveryPassword(this@MainActivity, passwordsList)
+                            } catch (e: JsonSyntaxException) {
+                                val en = Encryption()
+                                val passwordsList: List<PasswordInfo> =
+                                    gson.fromJson(en.decrypt(file, this@MainActivity), collectionType)
+                                viewModel.showRecoveryPassword(this@MainActivity, passwordsList)
+                            } catch (e: JsonParseException) {
+                                e.printStackTrace()
+                            }
                         }
                     }
                 }
