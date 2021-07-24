@@ -202,14 +202,18 @@ class MainActivity : AppCompatActivity(),
             }
         }
         if (backPressedListener?.onBackPressed() == true) {
-            passwordsFragment = PasswordsListFragment.newInstance()
-            cf.changeFragment(
-                fm,
-                R.id.container_fragment,
-                passwordsFragment,
-                backStack = false,
-                animation = true
-            )
+            if (backPressedListener !is PasswordsListFragment) {
+                passwordsFragment = PasswordsListFragment.newInstance()
+                cf.changeFragment(
+                    fm,
+                    R.id.container_fragment,
+                    passwordsFragment,
+                    backStack = false,
+                    animation = true
+                )
+            } else {
+                super.onBackPressed()
+            }
         }
         if (backPressedListener?.onBackPressed() == null) {
             if (!changeValue) {

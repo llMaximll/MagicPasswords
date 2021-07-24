@@ -14,7 +14,13 @@ import com.github.llmaximll.magicpasswords.background.DeletePasswordWorker
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
+import com.github.llmaximll.magicpasswords.states.ListState
 import com.github.llmaximll.magicpasswords.vm.PasswordsListVM
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -23,9 +29,9 @@ class PasswordsListAdapter(
     private var passwordsList: MutableList<PasswordInfo>,
     private val viewModel: PasswordsListVM,
     private val context: Context,
-    private val parentView: View
-) :
-    RecyclerView.Adapter<PasswordsListHolder>(), ItemTouchHelperAdapter {
+    private val parentView: View) :
+    RecyclerView.Adapter<PasswordsListHolder>(),
+    ItemTouchHelperAdapter {
 
     private val workManager = WorkManager.getInstance(context)
     private var cf: CommonFunctions = CommonFunctions.get()
@@ -35,7 +41,7 @@ class PasswordsListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PasswordsListHolder {
         view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_rv_passwords_list, parent, false)
-        return PasswordsListHolder(view)
+        return PasswordsListHolder(view, viewModel)
     }
 
     override fun onBindViewHolder(holder: PasswordsListHolder, position: Int) {
@@ -93,8 +99,9 @@ class PasswordsListAdapter(
         workManager.enqueue(myWorkRequest)
     }
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
+    override fun onViewAttachedToWindow(holder: PasswordsListHolder) {
+        super.onViewAttachedToWindow(holder)
         sp = cf.getSharedPreferences(context)
+        holder.setSelected(viewModel.selectedDataFlow.value is ListState.SELECTED)
     }
 }

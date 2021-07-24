@@ -1,24 +1,38 @@
 package com.github.llmaximll.magicpasswords.vm
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
+import com.github.llmaximll.magicpasswords.states.ListState
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.*
 
 private const val KEY_RECYCLER_VIEW = "key_recycler_view"
 
 class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
     private val repository = MagicRepository.get()
+    private val cf = CommonFunctions.get()
+    private val savedStateHandle = state
     private val passwordsListDataFlow = MutableStateFlow<List<PasswordInfo>?>(null)
     val passwordsListFlow = passwordsListDataFlow.asStateFlow()
+    val setAllDataFlow = MutableStateFlow(false)
+    /**
+     * Переменная [selectedDataFlow] показывает состояние фрагмента:
+     * false - стандартное, true - какой-то элемент списка выделен
+     */
+    val selectedDataFlow = MutableStateFlow<ListState>(ListState.UNSELECTED)
+    val selectedPasswordsMMap = mutableMapOf<Int, PasswordInfo>()
 
-    private val savedStateHandle = state
+    val passwordsList = mutableListOf<PasswordInfo>()
 
     fun getAllPasswords(removed: Int = 0) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -35,6 +49,33 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
     fun deletePassword(password: PasswordInfo) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deletePasswordById(password.id)
+        }
+    }
+
+    fun deletePasswords(mMap: MutableMap<Int, PasswordInfo>, context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val sp = cf.getSharedPreferences(context)
+            val deleteFormat = sp.getInt(cf.spTimeDelete, CommonFunctions.TimeDeleteMonthSP)
+            if (deleteFormat != CommonFunctions.TimeDeleteImmediatelySP) {
+                for (i in mMap.values) {
+                    i.apply {
+                        removed = 1
+                        removedDate = Calendar.getInstance().timeInMillis
+                        removedFormat = deleteFormat
+                    }
+                }
+                val count = repository.updateAllPasswords(mMap.values.toList())
+                withContext(Dispatchers.Main) {
+                    if (sp.getInt(cf.spTimeDelete, CommonFunctions.TimeDeleteMonthSP) !=
+                        CommonFunctions.TimeDeleteImmediatelySP) {
+                        cf.toast(context, "Добавлено в корзину: $count")
+                    } else {
+                        cf.toast(context, "Удалено: $count")
+                    }
+                }
+            } else {
+                repository.deleteAllPasswords(mMap.values.toList())
+            }
         }
     }
 

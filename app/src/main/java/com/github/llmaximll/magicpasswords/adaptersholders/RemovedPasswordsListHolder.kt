@@ -6,14 +6,17 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.states.ListState
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.vm.RecycleBinVM
 import java.util.*
 
 private const val TAG = "RemovedPasswordsListHolder"
 
-class RemovedPasswordsListHolder(itemView: View, private val viewModel: RecycleBinVM)
+class RemovedPasswordsListHolder(
+    itemView: View,
+    private val viewModel: RecycleBinVM)
     : RecyclerView.ViewHolder(itemView),
     View.OnTouchListener,
     View.OnLongClickListener
@@ -32,14 +35,16 @@ class RemovedPasswordsListHolder(itemView: View, private val viewModel: RecycleB
         }
     }
 
-    fun bind(passwordInfo: PasswordInfo, position: Int) {
+    fun bind(
+        passwordInfo: PasswordInfo,
+        position: Int
+    ) {
         this.passwordInfo = passwordInfo
         nameTextView.text = passwordInfo.name
         descriptionTextView.text = passwordInfo.description
         val calendar = Calendar.getInstance()
         calendar.time = Date(passwordInfo.removedDate)
         val currentCalendar = Calendar.getInstance()
-        viewModel.selectedPasswordsMMap[position] = passwordInfo
         when (passwordInfo.removedFormat) {
             CommonFunctions.TimeDeleteDaySP -> {
                 val hours = currentCalendar.get(Calendar.HOUR_OF_DAY) - calendar.get(Calendar.HOUR_OF_DAY)
@@ -54,7 +59,10 @@ class RemovedPasswordsListHolder(itemView: View, private val viewModel: RecycleB
                 dateTextView.text = "До удаления: ${30 - minutes} дней"
             }
         }
-        if (viewModel.selected.value) {
+        if (viewModel.selectedDataFlow.value is ListState.SELECTED) {
+            if (viewModel.setAllDataFlow.value) {
+                checkBox.isChecked = true
+            }
             var checked = false
             for (key in viewModel.selectedPasswordsMMap.keys) {
                 if (key == adapterPosition) {
@@ -77,8 +85,11 @@ class RemovedPasswordsListHolder(itemView: View, private val viewModel: RecycleB
     }
 
     override fun onLongClick(v: View?): Boolean {
-        return if (!viewModel.selected.value) {
-            viewModel.selected.value = true
+        return if (viewModel.selectedDataFlow.value is ListState.UNSELECTED) {
+            viewModel.run {
+                selectedPasswordsMMap[adapterPosition] = passwordInfo
+                selectedDataFlow.value = ListState.SELECTED
+            }
             true
         } else {
             false
@@ -95,8 +106,7 @@ class RemovedPasswordsListHolder(itemView: View, private val viewModel: RecycleB
             }
             MotionEvent.ACTION_UP -> {
                 cf.animateView(itemView, true, zChange = true)
-                if (viewModel.selected.value) {
-                    cf.log(TAG, "onClick()")
+                if (viewModel.selectedDataFlow.value is ListState.SELECTED) {
                     checkBox.isChecked = !checkBox.isChecked
                     if (checkBox.isChecked) {
                         viewModel.selectedPasswordsMMap[adapterPosition] = passwordInfo

@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.states.ListState
 import com.github.llmaximll.magicpasswords.vm.RecycleBinVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,16 +20,13 @@ import kotlinx.coroutines.launch
 class RemovedPasswordsListAdapter(
     private var passwordsList: MutableList<PasswordInfo>,
     private val viewModel: RecycleBinVM,
-    private val context: Context,
-    private val setAll: Boolean
-) :
+    private val context: Context) :
     RecyclerView.Adapter<RemovedPasswordsListHolder>() {
 
     private val workManager = WorkManager.getInstance(context)
     private lateinit var view: View
     private lateinit var password: PasswordInfo
     private var cf: CommonFunctions = CommonFunctions.get()
-    private val scope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RemovedPasswordsListHolder {
         view = LayoutInflater.from(parent.context)
@@ -51,15 +49,6 @@ class RemovedPasswordsListAdapter(
 
     override fun onViewAttachedToWindow(holder: RemovedPasswordsListHolder) {
         super.onViewAttachedToWindow(holder)
-        scope.launch {
-            viewModel.selected.collect {
-                holder.setSelected(it)
-            }
-        }
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        scope.cancel()
+        holder.setSelected(viewModel.selectedDataFlow.value is ListState.SELECTED)
     }
 }

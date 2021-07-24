@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkManager
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
+import com.github.llmaximll.magicpasswords.states.ListState
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,12 +25,16 @@ class RecycleBinVM(state: SavedStateHandle) : ViewModel() {
     private val savedStateHandle = state
     private val passwordsListDataFlow = MutableStateFlow<List<PasswordInfo>?>(null)
     val passwordsListFlow = passwordsListDataFlow.asStateFlow()
+    val setAllDataFlow = MutableStateFlow(false)
+
     /**
-     * Переменная [selected] показывает состояние фрагмента
+     * Переменная [selectedDataFlow] показывает состояние фрагмента
      * false - стандартное, true - какой-то элемент списка выделен
      */
-    val selected = MutableStateFlow(false)
+    val selectedDataFlow = MutableStateFlow<ListState>(ListState.UNSELECTED)
     val selectedPasswordsMMap = mutableMapOf<Int, PasswordInfo>()
+
+    var passwordsList = mutableListOf<PasswordInfo>()
 
     fun getAllPasswords(removed: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -41,7 +46,6 @@ class RecycleBinVM(state: SavedStateHandle) : ViewModel() {
         val workManager = WorkManager.getInstance(context)
         viewModelScope.launch(Dispatchers.IO) {
             val count = repository.updateAllPasswords(mMap.values.toList())
-            selected.value = false
             val tagList = mutableListOf<String>()
             for (el in mMap.values) {
                 tagList += "{$el}"
@@ -57,7 +61,6 @@ class RecycleBinVM(state: SavedStateHandle) : ViewModel() {
         val workManager = WorkManager.getInstance(context)
         viewModelScope.launch(Dispatchers.IO) {
             val count = repository.deleteAllPasswords(mMap.values.toList())
-            selected.value = false
             val tagList = mutableListOf<String>()
             for (el in mMap.values) {
                 tagList += "{$el}"
