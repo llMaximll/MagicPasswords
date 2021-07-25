@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.activities.MainActivity
 import com.github.llmaximll.magicpasswords.databinding.FragmentSettingsBinding
@@ -22,8 +21,7 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "SettingsFragment"
 
-class SettingsFragment : Fragment(),
-    OnBackPressedListener {
+class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
     private lateinit var cf: CommonFunctions
@@ -156,11 +154,5 @@ class SettingsFragment : Fragment(),
 
             biometricPrompt.authenticate(promptInfo)
         }
-    }
-
-    override fun onBackPressed(): Boolean = true
-
-    companion object {
-        fun newInstance(): SettingsFragment = SettingsFragment()
     }
 }

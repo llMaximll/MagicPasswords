@@ -6,13 +6,13 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.adaptersholders.RemovedPasswordsListAdapter
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
@@ -26,14 +26,19 @@ import java.util.*
 
 private const val TAG = "RecycleBinFragment"
 
-class RecycleBinFragment : Fragment(),
-    OnBackPressedListener {
+class RecycleBinFragment : Fragment() {
 
     private lateinit var binding: FragmentRecycleBinBinding
     private lateinit var viewModel: RecycleBinVM
     private lateinit var cf: CommonFunctions
     private lateinit var adapter: RemovedPasswordsListAdapter
     private var recyclerViewState: Parcelable? = null
+
+    private val backPressedDispatcher = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            this@RecycleBinFragment.onBackPressed()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,12 +76,12 @@ class RecycleBinFragment : Fragment(),
         viewModel.saveRecyclerViewState(recyclerViewState as LinearLayoutManager.SavedState?)
     }
 
-    override fun onBackPressed(): Boolean {
-        return if (viewModel.selectedDataFlow.value is ListState.SELECTED) {
+    private fun onBackPressed() {
+        backPressedDispatcher.isEnabled = false
+        if (viewModel.selectedDataFlow.value is ListState.SELECTED) {
             viewModel.selectedDataFlow.value = ListState.UNSELECTED
-            false
         } else {
-            true
+            requireActivity().onBackPressed()
         }
     }
 
@@ -143,7 +148,7 @@ class RecycleBinFragment : Fragment(),
         rV.adapter = adapter
     }
     /**
-     * В зависимости от переменной [viewModel.selected] функция выполняет то или иное состояние фрагмента (внешний вид)
+     * В зависимости от переменной selected функция выполняет то или иное состояние фрагмента (внешний вид)
      */
     @SuppressLint("NotifyDataSetChanged")
     private fun isSelectedFragment() {
@@ -181,9 +186,5 @@ class RecycleBinFragment : Fragment(),
                 }
             }
         }
-    }
-
-    companion object {
-        fun newInstance(): RecycleBinFragment = RecycleBinFragment()
     }
 }

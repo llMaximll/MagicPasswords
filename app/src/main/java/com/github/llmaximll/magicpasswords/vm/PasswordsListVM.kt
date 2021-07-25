@@ -1,7 +1,6 @@
 package com.github.llmaximll.magicpasswords.vm
 
 import android.content.Context
-import android.text.Editable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import com.github.llmaximll.magicpasswords.states.ListState
-import com.github.llmaximll.magicpasswords.states.SearchState
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,8 +33,6 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
     val selectedPasswordsMMap = mutableMapOf<Int, PasswordInfo>()
 
     val passwordsList = mutableListOf<PasswordInfo>()
-
-    val searchDataFlow = MutableStateFlow<SearchState>(SearchState.INACTIVE)
 
     fun getAllPasswords(removed: Int = 0) {
         viewModelScope.launch(Dispatchers.IO) {

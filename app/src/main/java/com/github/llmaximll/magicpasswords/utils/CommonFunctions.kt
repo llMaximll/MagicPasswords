@@ -14,9 +14,13 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.github.llmaximll.magicpasswords.BuildConfig
+import com.github.llmaximll.magicpasswords.background.DeletePasswordWorker
 import com.google.android.material.snackbar.Snackbar
+import java.util.concurrent.TimeUnit
 
 private const val SP_NAME = "sp_magic_passwords"
 
@@ -60,6 +64,36 @@ class CommonFunctions private constructor() {
 
     fun <T: ViewModel> initViewModel(owner: ViewModelStoreOwner, modelClass: Class<T>): ViewModel {
         return ViewModelProvider(owner).get(modelClass)
+    }
+
+    fun deletePasswordWorkManager(
+        context: Context,
+        passwordsIdList: List<String>
+    ) {
+        val workManager = WorkManager.getInstance(context)
+        val sp = getSharedPreferences(context)
+        val duration = sp.getInt(spTimeDelete, TimeDeleteMonthSP)
+        for (id in passwordsIdList) {
+            val myData = Data.Builder().apply {
+                putString("passwordId", id)
+            }.build()
+            val myWorkRequest = OneTimeWorkRequestBuilder<DeletePasswordWorker>().apply {
+                addTag(id)
+                setInputData(myData)
+                when (duration) {
+                    TimeDeleteDaySP -> {
+                        setInitialDelay(24, TimeUnit.HOURS)
+                    }
+                    TimeDeleteWeakSP -> {
+                        setInitialDelay(7, TimeUnit.DAYS)
+                    }
+                    TimeDeleteMonthSP -> {
+                        setInitialDelay(30, TimeUnit.DAYS)
+                    }
+                }
+            }.build()
+            workManager.enqueue(myWorkRequest)
+        }
     }
 
     fun cancelAllWorkByTag(workManager: WorkManager, tagList: List<String>) {

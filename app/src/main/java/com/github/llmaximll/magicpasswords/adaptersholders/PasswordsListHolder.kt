@@ -91,7 +91,7 @@ class PasswordsListHolder(
                 cf.animateView(itemView, true, zChange = true)
                 if (viewModel.selectedDataFlow.value is ListState.UNSELECTED) {
                     Log.i("TAG", "position=$adapterPosition")
-                    callbacks?.onPasswordsListFragment("add", passwordInfo.id.toString(), itemView)
+                    callbacks?.onPasswordsListFragmentChangePassword(passwordInfo.id.toString())
                 }
                 if (viewModel.selectedDataFlow.value is ListState.SELECTED) {
                     checkBox.isChecked = !checkBox.isChecked

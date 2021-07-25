@@ -1,6 +1,5 @@
 package com.github.llmaximll.magicpasswords.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -12,12 +11,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.github.llmaximll.magicpasswords.Encryption
-import com.github.llmaximll.magicpasswords.activities.MainActivity
-import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentChangePasswordBinding
+import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.vm.ChangePasswordVM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -26,22 +23,13 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 private const val TAG = "ChangePasswordFragment"
-private const val ARG_ID_PASSWORD = "arg_id_password"
-private const val ARG_TRANSITION_NAME = "arg_transition_name"
 
-class ChangePasswordFragment : Fragment(),
-    OnBackPressedListener {
-
-    interface Callbacks {
-        fun onChangePasswordFragment()
-    }
+class ChangePasswordFragment : Fragment() {
 
     private lateinit var binding: FragmentChangePasswordBinding
     private lateinit var viewModel: ChangePasswordVM
     private lateinit var cf: CommonFunctions
     private lateinit var idPassword: UUID
-    private lateinit var transitionName: String
-    private var callbacks: Callbacks? = null
     private var name = ""
     private var password = ""
     private var description = ""
@@ -52,16 +40,13 @@ class ChangePasswordFragment : Fragment(),
         super.onCreate(savedInstanceState)
         cf = CommonFunctions.get()
         //arguments
-        val id = arguments?.getString(ARG_ID_PASSWORD)
-        transitionName = arguments?.getString(ARG_TRANSITION_NAME) ?: "transition_null"
-        if (id != "null") {
-            idPassword = UUID.fromString(id)
+        idPassword = try {
+            UUID.fromString(arguments?.getString(ARG_ID_PASSWORD))
+        } catch (e: Exception) {
+            cf.toast(requireContext(), "Ошибка загрузки пароля")
+            requireActivity().onBackPressed()
+            UUID.randomUUID()
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        callbacks = context as Callbacks
     }
 
     override fun onCreateView(
@@ -91,7 +76,7 @@ class ChangePasswordFragment : Fragment(),
                         address = address,
                         messagePassword = binding.messageRadioButton.isChecked
                     ))
-                callbacks?.onChangePasswordFragment()
+                requireActivity().onBackPressed()
             }
         }
         binding.passwordToggleCheckBox.setOnCheckedChangeListener { _, isChecked ->
@@ -173,15 +158,8 @@ class ChangePasswordFragment : Fragment(),
         if (this::idPassword.isInitialized) {
             restorePassword()
         }
-        //transition
-        binding.scrollView.transitionName = transitionName
         //Другое
         binding.withoutRadioButton.isChecked = true
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        callbacks = null
     }
 
     private fun restorePassword() {
@@ -207,26 +185,10 @@ class ChangePasswordFragment : Fragment(),
         binding.changeButton.visibility = View.VISIBLE
     }
 
-    override fun onBackPressed(): Boolean {
-        return if (this::idPassword.isInitialized) {
-            true
-        } else {
-            (activity as? MainActivity)?.replaceMainFragments(MainActivity.REPLACE_ON_PASSWORDS_LIST_FRAGMENT)
-            false
-        }
-    }
-
     companion object {
-        fun newInstance(idPassword: String, transitionName: String): ChangePasswordFragment {
-            val args = Bundle().apply {
-                putString(ARG_ID_PASSWORD, idPassword)
-                putString(ARG_TRANSITION_NAME, transitionName)
-            }
-            return ChangePasswordFragment().apply {
-                arguments = args
-            }
-        }
         const val PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS = 0
         const val PASSWORD_FORMAT_WITH_SPEC_SYMBOLS = 1
+        // Аргументы
+        const val ARG_ID_PASSWORD = "arg_id_password"
     }
 }

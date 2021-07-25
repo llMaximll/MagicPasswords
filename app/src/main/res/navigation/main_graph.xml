@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/passwordsListFragment">
+
+    <fragment
+        android:id="@+id/passwordsListFragment"
+        android:name="com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment"
+        android:label="PasswordsListFragment" >
+        <action
+            android:id="@+id/action_passwordsListFragment_to_changePasswordFragment"
+            app:destination="@id/changePasswordFragment" />
+        <action
+            android:id="@+id/action_passwordsListFragment_to_recycleBinFragment"
+            app:destination="@id/recycleBinFragment" />
+        <action
+            android:id="@+id/action_passwordsListFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recycleBinFragment"
+        android:name="com.github.llmaximll.magicpasswords.fragments.RecycleBinFragment"
+        android:label="RecycleBinFragment" />
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment"
+        android:label="ChangePasswordFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.github.llmaximll.magicpasswords.fragments.SettingsFragment"
+        android:label="SettingsFragment" />
+</navigation>

@@ -13,16 +13,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.animation.doOnEnd
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.transition.TransitionInflater
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.github.llmaximll.magicpasswords.Encryption
-import com.github.llmaximll.magicpasswords.OnBackPressedListener
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.ActivityMainBinding
-import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
-import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
-import com.github.llmaximll.magicpasswords.fragments.RecycleBinFragment
-import com.github.llmaximll.magicpasswords.fragments.SettingsFragment
+import com.github.llmaximll.magicpasswords.fragments.*
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.utils.StorageUtils
 import com.github.llmaximll.magicpasswords.vm.MainActivityVM
@@ -41,13 +39,13 @@ private const val TAG = "MainActivity"
 private const val KEY_CHANGE_VALUE = "key_change_value"
 
 class MainActivity : AppCompatActivity(),
-    PasswordsListFragment.Callbacks,
-    ChangePasswordFragment.Callbacks {
+    PasswordsListFragment.Callbacks {
 
-    private lateinit var binding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
     private lateinit var cf: CommonFunctions
     private lateinit var viewModel: MainActivityVM
-    private lateinit var passwordsFragment: Fragment
+    private lateinit var navHostFragment: NavHostFragment
+    private lateinit var navController: NavController
     lateinit var createDocumentIntent: Intent
     lateinit var createDocumentResultLauncher: ActivityResultLauncher<Intent>
     lateinit var openDocumentIntent: Intent
@@ -72,15 +70,12 @@ class MainActivity : AppCompatActivity(),
         }
         setContentView(binding.root)
 
-        val currentFragment = supportFragmentManager
-            .findFragmentById(R.id.container_fragment)
-        if (currentFragment == null) {
-            passwordsFragment = PasswordsListFragment.newInstance()
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.container_fragment, passwordsFragment)
-                .commit()
-        }
+        navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+
+        NavigationUI.setupWithNavController(binding.navigationView, navController)
+
         changeValue = savedInstanceState?.getBoolean(KEY_CHANGE_VALUE) ?: false
         binding.secondContainer.visibility = if (changeValue)
             View.VISIBLE else
@@ -165,71 +160,15 @@ class MainActivity : AppCompatActivity(),
             }
     }
 
-    override fun onPasswordsListFragment(fragment: String, idPassword: String, sharedView: View?) {
-        val mFragment = when (fragment) {
-            "add" -> ChangePasswordFragment.newInstance(idPassword, sharedView?.transitionName ?: "null")
-            "settings" -> SettingsFragment.newInstance()
-            "recycle bin" -> RecycleBinFragment.newInstance()
-            "change" -> ChangePasswordFragment.newInstance(idPassword, sharedView?.transitionName ?: "null")
-            else -> ChangePasswordFragment.newInstance(idPassword, sharedView?.transitionName ?: "null")
+    override fun onPasswordsListFragmentChangePassword(idPassword: String) {
+        val args = Bundle().apply {
+            putString(ChangePasswordFragment.ARG_ID_PASSWORD, idPassword)
         }
-
-        mFragment.sharedElementEnterTransition = TransitionInflater.from(this)
-            .inflateTransition(android.R.transition.move)
-        mFragment.enterTransition = TransitionInflater.from(this)
-            .inflateTransition(android.R.transition.fade)
-
-        mFragment.sharedElementReturnTransition = TransitionInflater.from(this)
-            .inflateTransition(android.R.transition.move)
-
-        cf.changeFragment(
-            supportFragmentManager,
-            R.id.container_fragment,
-            mFragment,
-            animation = true,
-            transition = true,
-            sharedView = sharedView
-        )
+        navController.navigate(R.id.action_passwordsListFragment_to_changePasswordFragment, args)
     }
 
-    override fun onBackPressed() {
-        val fm = supportFragmentManager
-        var backPressedListener: OnBackPressedListener? = null
-        for (fragment in fm.fragments) {
-            if (fragment is OnBackPressedListener) {
-                backPressedListener = fragment
-                break
-            }
-        }
-        if (backPressedListener?.onBackPressed() == true) {
-            if (backPressedListener !is PasswordsListFragment) {
-                passwordsFragment = PasswordsListFragment.newInstance()
-                cf.changeFragment(
-                    fm,
-                    R.id.container_fragment,
-                    passwordsFragment,
-                    backStack = false,
-                    animation = true
-                )
-            } else {
-                super.onBackPressed()
-            }
-        }
-        if (backPressedListener?.onBackPressed() == null) {
-            if (!changeValue) {
-                super.onBackPressed()
-            } else {
-                val name = binding.nameEditText.text.toString()
-                val password = binding.passwordEditText.text.toString()
-                val password2 = binding.passwordEditText2.text.toString()
-                val description = binding.descriptionEditText.text.toString()
-                val address = binding.addressEditText.text.toString()
-                if (name != "" || password != "" || password2 != "" || description != "" || address != "") {
-                    cf.toast(this, "Черновик сохранён")
-                }
-                replaceMainFragments(REPLACE_ON_PASSWORDS_LIST_FRAGMENT)
-            }
-        }
+    override fun onPasswordsListFragmentAddPassword() {
+        replaceMainFragments(REPLACE_ON_ADD_FRAGMENT)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -266,8 +205,8 @@ class MainActivity : AppCompatActivity(),
                 binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
                 binding.difficultSeekBar.progress = difficultPassword
                 val startRadius = hypot(
-                    binding.containerFragment.width.toDouble(),
-                    binding.containerFragment.height.toDouble()
+                    binding.navHostFragment.width.toDouble(),
+                    binding.navHostFragment.height.toDouble()
                 ).toFloat()
                 val animatorCircular = ViewAnimationUtils.createCircularReveal(
                     binding.secondContainer,
@@ -283,7 +222,8 @@ class MainActivity : AppCompatActivity(),
                     }
                     animatorCircular.duration = 800L
                     animatorCircular.start()
-                    (passwordsFragment as? PasswordsListFragment)?.getAllPasswords()
+                    (navHostFragment.childFragmentManager.fragments[0] as? PasswordsListFragment)
+                        ?.viewModel?.getAllPasswords(0)
                 }
             }
         }
@@ -360,17 +300,17 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    fun replaceMainFragments(mode: Int) {
+    private fun replaceMainFragments(mode: Int) {
         when (mode) {
             REPLACE_ON_ADD_FRAGMENT -> {
                 val endRadius = hypot(
-                    binding.containerFragment.width.toDouble(),
-                    binding.containerFragment.height.toDouble()
+                    binding.navHostFragment.width.toDouble(),
+                    binding.navHostFragment.height.toDouble()
                 ).toFloat()
                 val animatorCircular = ViewAnimationUtils.createCircularReveal(
                     binding.secondContainer,
-                    binding.fabView.x.toInt() + 75,
-                    binding.fabView.y.toInt() + 75,
+                    binding.fabView.x.toInt() - 158,
+                    binding.fabView.y.toInt() + 70,
                     0f,
                     endRadius
                 )
@@ -381,13 +321,13 @@ class MainActivity : AppCompatActivity(),
             }
             REPLACE_ON_PASSWORDS_LIST_FRAGMENT -> {
                 val startRadius = hypot(
-                    binding.containerFragment.width.toDouble(),
-                    binding.containerFragment.height.toDouble()
+                    binding.navHostFragment.width.toDouble(),
+                    binding.navHostFragment.height.toDouble()
                 ).toFloat()
                 val animatorCircular = ViewAnimationUtils.createCircularReveal(
                     binding.secondContainer,
-                    binding.fabView.x.toInt() + 75,
-                    binding.fabView.y.toInt() + 75,
+                    binding.fabView.x.toInt() - 158,
+                    binding.fabView.y.toInt() + 70,
                     startRadius,
                     0f
                 )
@@ -403,14 +343,13 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    override fun onChangePasswordFragment() {
-        val fragment = PasswordsListFragment.newInstance()
-        cf.changeFragment(
-            supportFragmentManager,
-            R.id.container_fragment,
-            fragment,
-            animation = true
-        )
+    override fun onBackPressed() {
+        if (changeValue) {
+            replaceMainFragments(REPLACE_ON_PASSWORDS_LIST_FRAGMENT)
+            changeValue = false
+        } else {
+            super.onBackPressed()
+        }
     }
 
     companion object {
