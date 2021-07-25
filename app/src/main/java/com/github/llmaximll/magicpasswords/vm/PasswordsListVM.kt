@@ -1,6 +1,7 @@
 package com.github.llmaximll.magicpasswords.vm
 
 import android.content.Context
+import android.text.Editable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import com.github.llmaximll.magicpasswords.states.ListState
+import com.github.llmaximll.magicpasswords.states.SearchState
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +35,8 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
     val selectedPasswordsMMap = mutableMapOf<Int, PasswordInfo>()
 
     val passwordsList = mutableListOf<PasswordInfo>()
+
+    val searchDataFlow = MutableStateFlow<SearchState>(SearchState.INACTIVE)
 
     fun getAllPasswords(removed: Int = 0) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -77,6 +81,27 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
                 repository.deleteAllPasswords(mMap.values.toList())
             }
         }
+    }
+
+    suspend fun getRelevantPasswords(query: String?) {
+        if (query.isNullOrBlank()) {
+            repository.getAllPasswords(0).let {
+                passwordsListDataFlow.value = it
+            }
+        } else {
+            val sanitizedQuery = sanitizeSearchQuery("*$query*")
+            repository.getRelevantPasswords(sanitizedQuery).let {
+                passwordsListDataFlow.value = it
+            }
+        }
+    }
+
+    private fun sanitizeSearchQuery(query: String?): String {
+        if (query == null) {
+            return ""
+        }
+        val queryWithEscapedQuotes = query.replace(Regex.fromLiteral("\""), "\"\"")
+        return "*\"$queryWithEscapedQuotes\"*"
     }
 
     fun saveRecyclerViewState(mState: LinearLayoutManager.SavedState?) {

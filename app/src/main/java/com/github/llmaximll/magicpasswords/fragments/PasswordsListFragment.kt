@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -25,10 +26,13 @@ import com.github.llmaximll.magicpasswords.adaptersholders.SimpleItemTouchHelper
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentPasswordsListBinding
 import com.github.llmaximll.magicpasswords.states.ListState
+import com.github.llmaximll.magicpasswords.states.SearchState
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import com.github.llmaximll.magicpasswords.vm.PasswordsListVM
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val TAG = "PasswordsListFragment"
 private const val KEY_RECYCLER_VIEW = "key_recycler_view"
@@ -164,6 +168,24 @@ class PasswordsListFragment : Fragment(),
             }
             true
         }
+        val searchItem = toolBar.menu?.findItem(R.id.search)
+        val searchView = searchItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.searchDataFlow.value = SearchState.ACTIVE
+                if (newText != null) {
+                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                        viewModel.getRelevantPasswords(newText)
+                        viewModel.searchDataFlow.value = SearchState.INACTIVE
+                    }
+                }
+                return true
+            }
+        })
     }
 
     private fun setRecyclerView(passwordsList: List<PasswordInfo>) {
@@ -217,6 +239,18 @@ class PasswordsListFragment : Fragment(),
                             }
                             if (this@PasswordsListFragment::adapter.isInitialized) {
                                 adapter.notifyDataSetChanged()
+                            }
+                        }
+                }
+                launch {
+                    viewModel.searchDataFlow
+                        .collect { search ->
+                            if (search is SearchState.ACTIVE) {
+                                binding.progressBar.visibility = View.VISIBLE
+                                binding.passwordsRecyclerView.visibility = View.GONE
+                            } else {
+                                binding.progressBar.visibility = View.GONE
+                                binding.passwordsRecyclerView.visibility = View.VISIBLE
                             }
                         }
                 }

@@ -1,8 +1,12 @@
 package com.github.llmaximll.magicpasswords.repositories
 
 import android.content.Context
+import android.text.Editable
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfoFts
 import com.github.llmaximll.magicpasswords.database.MagicDatabase
 import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
@@ -16,7 +20,14 @@ class MagicRepository private constructor(context: Context) {
         context.applicationContext,
         MagicDatabase::class.java,
         DATABASE_NAME
-    ).build()
+    ).apply {
+        addCallback(object : RoomDatabase.Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                db.execSQL("INSERT INTO PasswordInfoFts(PasswordsInfoFts) VALUES ('rebuild')")
+            }
+        })
+    }.build()
 
     private val magicDao = database.magicDao()
 
@@ -84,6 +95,10 @@ class MagicRepository private constructor(context: Context) {
 
     fun deletePasswordById(passwordId: UUID) {
         magicDao.deletePasswordById(passwordId)
+    }
+
+    suspend fun getRelevantPasswords(query: String): List<PasswordInfo> {
+        return magicDao.getRelevantPasswords(query)
     }
 
     fun clearAllDatabase() {

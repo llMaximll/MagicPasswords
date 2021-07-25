@@ -2,6 +2,7 @@ package com.github.llmaximll.magicpasswords.database
 
 import androidx.room.*
 import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfoFts
 import java.util.*
 
 @Dao
@@ -29,4 +30,15 @@ interface MagicDao {
     
     @Query("DELETE FROM PasswordInfo WHERE id=(:passwordId)")
     fun deletePasswordById(passwordId: UUID)
+
+//    @Query("SELECT * FROM PasswordInfoFts WHERE name LIKE ('%' + :text + '%') OR address LIKE ('%' + :text + '%') OR description LIKE ('%' + :text + '%')")
+//    fun getRelevantPasswords(text: String): List<PasswordInfo>
+
+    @Query("""
+        SELECT *
+        FROM PasswordInfo
+        JOIN PasswordInfoFts ON PasswordInfo.name = PasswordInfoFts.name
+        WHERE PasswordInfoFts MATCH :query
+    """)
+    suspend fun getRelevantPasswords(query: String): List<PasswordInfo>
 }
