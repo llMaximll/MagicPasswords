@@ -12,17 +12,16 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-private const val salt = "QWlGnHNhMTJfQWZ342bGhpV"
-private const val iv = "W1397bfVQzFRQNjc4UFaXz"
+object Encryption {
 
-class Encryption {
-    private val cf = CommonFunctions.get()
+    private const val salt = "QWlGnHNhMTJfQWZ342bGhpV"
+    private const val iv = "W1397bfVQzFRQNjc4UFaXz"
 
     suspend fun encrypt(strToEncrypt: String, context: Context) :  String? {
         return suspendCoroutine { cont ->
             try {
-                val sp = cf.getSharedPreferences(context)
-                val mySecretKey: String? = sp.getString(cf.spSecretKey, null)
+                val sp = CommonFunctions.getSharedPreferences(context)
+                val mySecretKey: String? = sp.getString(CommonFunctions.spSecretKey, null)
                 val ivParameterSpec = IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
 
                 val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
@@ -48,8 +47,8 @@ class Encryption {
 
     fun decrypt(strToDecrypt : String, context: Context) : String? {
         try {
-            val sp = cf.getSharedPreferences(context)
-            val mySecretKey: String? = sp.getString(cf.spSecretKey, null)
+            val sp = CommonFunctions.getSharedPreferences(context)
+            val mySecretKey: String? = sp.getString(CommonFunctions.spSecretKey, null)
             val ivParameterSpec =  IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
 
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
@@ -59,14 +58,14 @@ class Encryption {
                 10000,
                 256
             )
-            val tmp = factory.generateSecret(spec);
+            val tmp = factory.generateSecret(spec)
             val secretKey =  SecretKeySpec(tmp.encoded, "AES")
 
-            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec)
             return  String(cipher.doFinal(Base64.decode(strToDecrypt, Base64.NO_PADDING)))
         } catch (e : Exception) {
-            println("Error while decrypting: $e");
+            println("Error while decrypting: $e")
         }
         return null
     }

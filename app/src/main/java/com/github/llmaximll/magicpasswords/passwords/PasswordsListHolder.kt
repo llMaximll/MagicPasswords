@@ -1,17 +1,14 @@
-package com.github.llmaximll.magicpasswords.adaptersholders
+package com.github.llmaximll.magicpasswords.passwords
 
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
-import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
+import com.github.llmaximll.magicpasswords.model.PasswordInfo
 import com.github.llmaximll.magicpasswords.states.ListState
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
-import com.github.llmaximll.magicpasswords.vm.PasswordsListVM
 
 class PasswordsListHolder(
     itemView: View,
@@ -24,7 +21,6 @@ class PasswordsListHolder(
     private val nameTextView: TextView = itemView.findViewById(R.id.name_textView)
     private val descriptionTextView: TextView = itemView.findViewById(R.id.description_textView)
     private val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
-    private val cf = CommonFunctions.get()
     private var callbacks: PasswordsListFragment.Callbacks? = null
 
     init {
@@ -82,16 +78,18 @@ class PasswordsListHolder(
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                cf.animateView(itemView, false, zChange = true)
+                CommonFunctions.animateView(itemView, false, zChange = true)
             }
             MotionEvent.ACTION_CANCEL -> {
-                cf.animateView(itemView, true, zChange = true)
+                CommonFunctions.animateView(itemView, true, zChange = true)
             }
             MotionEvent.ACTION_UP -> {
-                cf.animateView(itemView, true, zChange = true)
+                CommonFunctions.animateView(itemView, true, zChange = true)
                 if (viewModel.selectedDataFlow.value is ListState.UNSELECTED) {
-                    Log.i("TAG", "position=$adapterPosition")
-                    callbacks?.onPasswordsListFragmentChangePassword(passwordInfo.id.toString())
+                    callbacks?.onPasswordsListFragmentChangePassword(
+                        passwordInfo.id.toString(),
+                        itemView
+                    )
                 }
                 if (viewModel.selectedDataFlow.value is ListState.SELECTED) {
                     checkBox.isChecked = !checkBox.isChecked

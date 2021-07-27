@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Environment
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.File
@@ -20,10 +19,7 @@ object StorageUtils {
         return File(folder, fileName)
     }
 
-    private fun readFile(
-        context: Context,
-        file: File
-    ): String {
+    private fun readFile(file: File): String {
         val sb = StringBuilder()
         if (file.exists()) {
             try {
@@ -42,7 +38,6 @@ object StorageUtils {
     }
 
     private fun writeFile(
-        context: Context,
         text: String,
         file: File
     ) {
@@ -69,7 +64,6 @@ object StorageUtils {
 
     fun getTextFromStorage(
         rootDestination: File = File("/storage/emulated/0/"),
-        context: Context,
         fileName: String?,
         folderName: String?
     ): String {
@@ -78,12 +72,11 @@ object StorageUtils {
         } else {
             File(rootDestination.path)
         }
-        return readFile(context, file)
+        return readFile(file)
     }
 
     fun setTextInStorage(
         rootDestination: File = File("/storage/emulated/0/"),
-        context: Context,
         fileName: String?,
         folderName: String?,
         text: String
@@ -93,7 +86,7 @@ object StorageUtils {
         } else {
             File(rootDestination.path)
         }
-        writeFile(context, text, file)
+        writeFile(text, file)
     }
 
     fun checkSelfPermission(context: Context, permission: String): Boolean {

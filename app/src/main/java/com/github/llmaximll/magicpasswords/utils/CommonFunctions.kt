@@ -22,17 +22,25 @@ import com.github.llmaximll.magicpasswords.background.DeletePasswordWorker
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 
-private const val SP_NAME = "sp_magic_passwords"
+object CommonFunctions {
 
-class CommonFunctions private constructor() {
+    private const val SP_NAME = "sp_magic_passwords"
 
-    val spFirstLaunch = "sp_first_launch"
-    val spPassword = "sp_password"
-    val spFingerPrint = "sp_fingerprint"
-    val spThemeApp = "sp_theme_app"
-    val spTimeDelete = "sp_time_delete"
-    val spSecretKey = "sp_secret_key"
-    val spBackupEncryption = "sp_backup_encryption"
+    const val spFirstLaunch = "sp_first_launch"
+    const val spPassword = "sp_password"
+    const val spFingerPrint = "sp_fingerprint"
+    const val spThemeApp = "sp_theme_app"
+    const val spTimeDelete = "sp_time_delete"
+    const val spSecretKey = "sp_secret_key"
+    const val spBackupEncryption = "sp_backup_encryption"
+
+    const val SystemThemeSP = 0
+    const val LightThemeSP = 1
+    const val DarkThemeSP = 2
+    const val TimeDeleteImmediatelySP = 0
+    const val TimeDeleteDaySP = 1
+    const val TimeDeleteWeakSP = 2
+    const val TimeDeleteMonthSP = 3
 
     fun toast(context: Context, message: String) {
         Toast.makeText(
@@ -164,26 +172,5 @@ class CommonFunctions private constructor() {
 
     fun getSharedPreferences(context: Context): SharedPreferences {
         return context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
-    }
-
-    companion object {
-        private var INSTANCE: CommonFunctions? = null
-        fun init() {
-            if (INSTANCE == null) {
-                INSTANCE = CommonFunctions()
-            }
-        }
-        fun get(): CommonFunctions {
-            return requireNotNull(INSTANCE) {
-                "CommonFunctions should be initialized"
-            }
-        }
-        const val SystemThemeSP = 0
-        const val LightThemeSP = 1
-        const val DarkThemeSP = 2
-        const val TimeDeleteImmediatelySP = 0
-        const val TimeDeleteDaySP = 1
-        const val TimeDeleteWeakSP = 2
-        const val TimeDeleteMonthSP = 3
     }
 }

@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.vm
+package com.github.llmaximll.magicpasswords.settings
 
 import android.Manifest
 import android.app.Dialog
@@ -13,8 +13,7 @@ import android.widget.EditText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.activities.MainActivity
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.MainActivity
 import com.github.llmaximll.magicpasswords.databinding.BottomSheetChangeTimeDeleteBinding
 import com.github.llmaximll.magicpasswords.databinding.DialogBackupBinding
 import com.github.llmaximll.magicpasswords.databinding.DialogClearDatabaseBinding
@@ -29,13 +28,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private const val WRITE_EXTERNAL_STORAGE_REQUEST_PERMISSION = 1
-
 class SettingsVM : ViewModel() {
     private lateinit var sp: SharedPreferences
     private lateinit var oldPassword2: String
     private lateinit var deleteFormatDialog: Dialog
-    private val cf = CommonFunctions.get()
     private val repository = MagicRepository.get()
     private val changeThemeDataFlow = MutableStateFlow<Int?>(null)
     val changeThemeFlow = changeThemeDataFlow.asStateFlow()
@@ -45,15 +41,13 @@ class SettingsVM : ViewModel() {
     }
 
     fun initSharedPreferences(context: Context) {
-        sp = cf.getSharedPreferences(context)
-        oldPassword2 = sp.getString(cf.spPassword, "null") ?: "null"
+        sp = CommonFunctions.getSharedPreferences(context)
+        oldPassword2 = sp.getString(CommonFunctions.spPassword, "null") ?: "null"
     }
-
-    private suspend fun getAllPasswords(): List<PasswordInfo> = repository.getAllPasswords(0)
 
     private fun saveNewPassword(newPassword: String) {
         val editor = sp.edit()
-        editor.putString(cf.spPassword, newPassword)
+        editor.putString(CommonFunctions.spPassword, newPassword)
         editor.apply()
     }
 
@@ -80,7 +74,7 @@ class SettingsVM : ViewModel() {
             ) {
                 saveNewPassword(newPassword.text.toString())
                 dialog.dismiss()
-                cf.toast(context, "Пароль изменен")
+                CommonFunctions.toast(context, "Пароль изменен")
             }
         }
 
@@ -102,21 +96,21 @@ class SettingsVM : ViewModel() {
 
         systemThemeButton.setOnClickListener {
             val editor = sp.edit()
-            editor.putInt(cf.spThemeApp, CommonFunctions.SystemThemeSP)
+            editor.putInt(CommonFunctions.spThemeApp, CommonFunctions.SystemThemeSP)
             editor.apply()
             changeThemeDataFlow.value = CommonFunctions.SystemThemeSP //0
             dialog.dismiss()
         }
         lightThemeButton.setOnClickListener {
             val editor = sp.edit()
-            editor.putInt(cf.spThemeApp, CommonFunctions.LightThemeSP)
+            editor.putInt(CommonFunctions.spThemeApp, CommonFunctions.LightThemeSP)
             editor.apply()
             changeThemeDataFlow.value = CommonFunctions.LightThemeSP //1
             dialog.dismiss()
         }
         darkThemeButton.setOnClickListener {
             val editor = sp.edit()
-            editor.putInt(cf.spThemeApp, CommonFunctions.DarkThemeSP)
+            editor.putInt(CommonFunctions.spThemeApp, CommonFunctions.DarkThemeSP)
             editor.apply()
             changeThemeDataFlow.value = CommonFunctions.DarkThemeSP //1
             dialog.dismiss()
@@ -142,21 +136,21 @@ class SettingsVM : ViewModel() {
 
         binding.dayButton.setOnClickListener {
             val editor = sp.edit()
-            editor.putInt(cf.spTimeDelete, CommonFunctions.TimeDeleteDaySP)
+            editor.putInt(CommonFunctions.spTimeDelete, CommonFunctions.TimeDeleteDaySP)
             editor.apply()
             deleteFormatDialog.dismiss()
         }
 
         binding.weakButton.setOnClickListener {
             val editor = sp.edit()
-            editor.putInt(cf.spTimeDelete, CommonFunctions.TimeDeleteWeakSP)
+            editor.putInt(CommonFunctions.spTimeDelete, CommonFunctions.TimeDeleteWeakSP)
             editor.apply()
             deleteFormatDialog.dismiss()
         }
 
         binding.monthButton.setOnClickListener {
             val editor = sp.edit()
-            editor.putInt(cf.spTimeDelete, CommonFunctions.TimeDeleteMonthSP)
+            editor.putInt(CommonFunctions.spTimeDelete, CommonFunctions.TimeDeleteMonthSP)
             editor.apply()
             deleteFormatDialog.dismiss()
         }
@@ -177,7 +171,7 @@ class SettingsVM : ViewModel() {
 
         binding.yesButton.setOnClickListener {
             val editor = sp.edit()
-            editor.putInt(cf.spTimeDelete, CommonFunctions.TimeDeleteImmediatelySP)
+            editor.putInt(CommonFunctions.spTimeDelete, CommonFunctions.TimeDeleteImmediatelySP)
             editor.apply()
             dialog.dismiss()
             deleteFormatDialog.dismiss()
@@ -227,20 +221,18 @@ class SettingsVM : ViewModel() {
         val binding = DialogBackupBinding.bind(view)
 
         binding.yesButton.setOnClickListener {
-            val cf = CommonFunctions.get()
-            val sp = cf.getSharedPreferences(context)
+            val sp = CommonFunctions.getSharedPreferences(context)
             val editor = sp.edit()
-            editor.putBoolean(cf.spBackupEncryption, true)
+            editor.putBoolean(CommonFunctions.spBackupEncryption, true)
             editor.apply()
             backupPasswords(context, activity)
             dialog.dismiss()
         }
 
         binding.noButton.setOnClickListener {
-            val cf = CommonFunctions.get()
-            val sp = cf.getSharedPreferences(context)
+            val sp = CommonFunctions.getSharedPreferences(context)
             val editor = sp.edit()
-            editor.putBoolean(cf.spBackupEncryption, false)
+            editor.putBoolean(CommonFunctions.spBackupEncryption, false)
             editor.apply()
             backupPasswords(context, activity)
             dialog.dismiss()
@@ -284,15 +276,15 @@ class SettingsVM : ViewModel() {
     ): Boolean {
         when {
             oldPassword != oldPassword2 -> {
-                cf.toast(context, "Неверный старый пароль")
+                CommonFunctions.toast(context, "Неверный старый пароль")
                 return false
             }
             newPassword.length < 4 -> {
-                cf.toast(context, "Длина пароля не может быть меньше 4")
+                CommonFunctions.toast(context, "Длина пароля не может быть меньше 4")
                 return false
             }
             newPassword != secondPassword -> {
-                cf.toast(context, "Пароли не совпадают")
+                CommonFunctions.toast(context, "Пароли не совпадают")
                 return false
             }
         }
@@ -305,5 +297,9 @@ class SettingsVM : ViewModel() {
             return context.packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)
         }
         return false
+    }
+
+    companion object {
+        private const val WRITE_EXTERNAL_STORAGE_REQUEST_PERMISSION = 1
     }
 }

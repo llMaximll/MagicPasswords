@@ -1,46 +1,38 @@
-package com.github.llmaximll.magicpasswords.fragments
+package com.github.llmaximll.magicpasswords.passwords
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GravityCompat
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.transition.TransitionInflater
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.activities.MainActivity
-import com.github.llmaximll.magicpasswords.adaptersholders.PasswordsListAdapter
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.model.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentPasswordsListBinding
 import com.github.llmaximll.magicpasswords.states.ListState
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
-import com.github.llmaximll.magicpasswords.vm.PasswordsListVM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-private const val TAG = "PasswordsListFragment"
-
 class PasswordsListFragment : Fragment() {
 
     interface Callbacks {
-        fun onPasswordsListFragmentChangePassword(idPassword: String)
-        fun onPasswordsListFragmentAddPassword()
+        fun onPasswordsListFragmentChangePassword(idPassword: String, transitionView: View)
+        fun onPasswordsListFragmentSelected(state: Boolean)
+        fun onPasswordsListFragmentOnTouchPassword()
     }
 
-    private lateinit var binding: FragmentPasswordsListBinding
-    private lateinit var cf: CommonFunctions
+    lateinit var binding: FragmentPasswordsListBinding
     private lateinit var adapter: PasswordsListAdapter
     private var recyclerViewState: Parcelable? = null
     private var callbacks: Callbacks? = null
@@ -58,15 +50,6 @@ class PasswordsListFragment : Fragment() {
         callbacks = context as Callbacks
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        cf = CommonFunctions.get()
-        cf.log(TAG, "onCreate()")
-        //fragment transition
-        exitTransition = TransitionInflater.from(requireContext())
-            .inflateTransition(android.R.transition.fade)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -78,7 +61,7 @@ class PasswordsListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = cf.initViewModel(this, PasswordsListVM::class.java) as PasswordsListVM
+        viewModel = CommonFunctions.initViewModel(this, PasswordsListVM::class.java) as PasswordsListVM
         recyclerViewState = viewModel.getRecyclerViewState()
         if (viewModel.passwordsList.isEmpty()) {
             viewModel.getAllPasswords(0)
@@ -89,24 +72,14 @@ class PasswordsListFragment : Fragment() {
         isSelectedFragment()
         // Back button
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedDispatcher)
+        // Transition
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onStart() {
-        super.onStart()
-        binding.addPasswordFab.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    cf.animateView(v, reverse = false, zChange = false, .8f)
-                }
-                MotionEvent.ACTION_UP -> {
-                    cf.animateView(v, reverse = true, zChange = false, .8f)
-                    callbacks?.onPasswordsListFragmentAddPassword()
-                    v.performClick()
-                }
-            }
-            true
-        }
+    override fun onResume() {
+        super.onResume()
+        viewModel.getAllPasswords(0)
     }
 
     private fun onBackPressed() {
@@ -130,10 +103,6 @@ class PasswordsListFragment : Fragment() {
     }
 
     private fun setToolBar(toolBar: Toolbar = binding.toolBar) {
-        toolBar.setNavigationIcon(R.drawable.ic_menu)
-        toolBar.setNavigationOnClickListener {
-            (requireActivity() as MainActivity).binding.drawerLayout.openDrawer(GravityCompat.START)
-        }
         toolBar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.delete_passwords -> {
@@ -143,7 +112,7 @@ class PasswordsListFragment : Fragment() {
                         viewModel.selectedPasswordsMMap.values.forEach {
                             idList.add("${it.id}")
                         }
-                        cf.deletePasswordWorkManager(
+                        CommonFunctions.deletePasswordWorkManager(
                             requireContext(),
                             idList
                         )
@@ -151,7 +120,7 @@ class PasswordsListFragment : Fragment() {
                         setRecyclerView(viewModel.passwordsList)
                         viewModel.selectedDataFlow.value = ListState.UNSELECTED
                     } else {
-                        cf.toast(requireContext(), "Не выбраны элементы списка")
+                        CommonFunctions.toast(requireContext(), "Не выбраны элементы списка")
                     }
                 }
                 R.id.select_all -> {
@@ -160,22 +129,14 @@ class PasswordsListFragment : Fragment() {
             }
             true
         }
-        val searchItem = toolBar.menu?.findItem(R.id.search)
-        val searchView = searchItem?.actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return true
-            }
+    }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null) {
-                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                        viewModel.getRelevantPasswords(newText)
-                    }
-                }
-                return true
+    fun onSearch(newText: String?) {
+        if (newText != null) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                viewModel.getRelevantPasswords(newText)
             }
-        })
+        }
     }
 
     private fun setRecyclerView(passwordsList: List<PasswordInfo>) {
@@ -213,6 +174,7 @@ class PasswordsListFragment : Fragment() {
                             if (this@PasswordsListFragment::adapter.isInitialized) {
                                 adapter.notifyDataSetChanged()
                             }
+                            callbacks?.onPasswordsListFragmentSelected(state is ListState.SELECTED)
                         }
                 }
                 launch {

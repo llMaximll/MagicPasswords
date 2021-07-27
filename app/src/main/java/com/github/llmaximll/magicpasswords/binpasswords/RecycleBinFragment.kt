@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.fragments
+package com.github.llmaximll.magicpasswords.binpasswords
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -14,23 +14,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.adaptersholders.RemovedPasswordsListAdapter
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.model.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentRecycleBinBinding
 import com.github.llmaximll.magicpasswords.states.ListState
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
-import com.github.llmaximll.magicpasswords.vm.RecycleBinVM
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
-
-private const val TAG = "RecycleBinFragment"
 
 class RecycleBinFragment : Fragment() {
 
     private lateinit var binding: FragmentRecycleBinBinding
     private lateinit var viewModel: RecycleBinVM
-    private lateinit var cf: CommonFunctions
     private lateinit var adapter: RemovedPasswordsListAdapter
     private var recyclerViewState: Parcelable? = null
 
@@ -38,11 +33,6 @@ class RecycleBinFragment : Fragment() {
         override fun handleOnBackPressed() {
             this@RecycleBinFragment.onBackPressed()
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        cf = CommonFunctions.get()
     }
 
     override fun onCreateView(
@@ -56,7 +46,7 @@ class RecycleBinFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = cf.initViewModel(this, RecycleBinVM::class.java) as RecycleBinVM
+        viewModel = CommonFunctions.initViewModel(this, RecycleBinVM::class.java) as RecycleBinVM
         //Другое
         recyclerViewState = viewModel.getRecyclerViewState()
 
@@ -67,7 +57,7 @@ class RecycleBinFragment : Fragment() {
             setRecyclerView(viewModel.passwordsList)
         }
         isSelectedFragment()
-        cf.log(TAG, "selectedPasswordsMMap=${viewModel.selectedPasswordsMMap.values.size}")
+        CommonFunctions.log(TAG, "selectedPasswordsMMap=${viewModel.selectedPasswordsMMap.values.size}")
     }
 
     override fun onPause() {
@@ -111,7 +101,7 @@ class RecycleBinFragment : Fragment() {
                         setRecyclerView(viewModel.passwordsList)
                         viewModel.selectedDataFlow.value = ListState.UNSELECTED
                     } else {
-                        cf.toast(requireContext(), "Не выбраны элементы списка")
+                        CommonFunctions.toast(requireContext(), "Не выбраны элементы списка")
                     }
                 }
                 R.id.recover_passwords -> {
@@ -125,7 +115,7 @@ class RecycleBinFragment : Fragment() {
                         setRecyclerView(viewModel.passwordsList)
                         viewModel.selectedDataFlow.value = ListState.UNSELECTED
                     } else {
-                        cf.toast(requireContext(), "Не выбраны элементы списка")
+                        CommonFunctions.toast(requireContext(), "Не выбраны элементы списка")
                     }
                 }
                 R.id.select_all -> {
@@ -142,8 +132,7 @@ class RecycleBinFragment : Fragment() {
         rV.layoutManager?.onRestoreInstanceState(recyclerViewState)
         adapter = RemovedPasswordsListAdapter(
             passwordsList.toMutableList(),
-            viewModel,
-            requireContext()
+            viewModel
         )
         rV.adapter = adapter
     }
@@ -186,5 +175,9 @@ class RecycleBinFragment : Fragment() {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "RecycleBinFragment"
     }
 }

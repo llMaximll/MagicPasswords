@@ -7,28 +7,35 @@
 
     <fragment
         android:id="@+id/passwordsListFragment"
-        android:name="com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment"
+        android:name="com.github.llmaximll.magicpasswords.passwords.PasswordsListFragment"
         android:label="PasswordsListFragment" >
-        <action
-            android:id="@+id/action_passwordsListFragment_to_changePasswordFragment"
-            app:destination="@id/changePasswordFragment" />
         <action
             android:id="@+id/action_passwordsListFragment_to_recycleBinFragment"
             app:destination="@id/recycleBinFragment" />
         <action
             android:id="@+id/action_passwordsListFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_passwordsListFragment_to_addPasswordFragment"
+            app:destination="@id/addPasswordFragment" />
+        <action
+            android:id="@+id/action_passwordsListFragment_to_changePasswordFragment"
+            app:destination="@id/changePasswordFragment" />
     </fragment>
     <fragment
         android:id="@+id/recycleBinFragment"
-        android:name="com.github.llmaximll.magicpasswords.fragments.RecycleBinFragment"
+        android:name="com.github.llmaximll.magicpasswords.binpasswords.RecycleBinFragment"
         android:label="RecycleBinFragment" />
     <fragment
         android:id="@+id/changePasswordFragment"
-        android:name="com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment"
+        android:name="com.github.llmaximll.magicpasswords.changepassword.ChangePasswordFragment"
         android:label="ChangePasswordFragment" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.github.llmaximll.magicpasswords.fragments.SettingsFragment"
+        android:name="com.github.llmaximll.magicpasswords.settings.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/addPasswordFragment"
+        android:name="com.github.llmaximll.magicpasswords.addpassword.AddPasswordFragment"
+        android:label="AddPasswordFragment" />
 </navigation>

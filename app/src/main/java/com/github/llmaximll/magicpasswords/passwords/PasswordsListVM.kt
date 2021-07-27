@@ -1,11 +1,11 @@
-package com.github.llmaximll.magicpasswords.vm
+package com.github.llmaximll.magicpasswords.passwords
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.model.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import com.github.llmaximll.magicpasswords.states.ListState
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
@@ -16,11 +16,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-private const val KEY_RECYCLER_VIEW = "key_recycler_view"
-
 class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
     private val repository = MagicRepository.get()
-    private val cf = CommonFunctions.get()
     private val savedStateHandle = state
     private val passwordsListDataFlow = MutableStateFlow<List<PasswordInfo>?>(null)
     val passwordsListFlow = passwordsListDataFlow.asStateFlow()
@@ -40,22 +37,10 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
         }
     }
 
-    fun updatePassword(password: PasswordInfo) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updatePassword(password)
-        }
-    }
-
-    fun deletePassword(password: PasswordInfo) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deletePasswordById(password.id)
-        }
-    }
-
     fun deletePasswords(mMap: MutableMap<Int, PasswordInfo>, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            val sp = cf.getSharedPreferences(context)
-            val deleteFormat = sp.getInt(cf.spTimeDelete, CommonFunctions.TimeDeleteMonthSP)
+            val sp = CommonFunctions.getSharedPreferences(context)
+            val deleteFormat = sp.getInt(CommonFunctions.spTimeDelete, CommonFunctions.TimeDeleteMonthSP)
             if (deleteFormat != CommonFunctions.TimeDeleteImmediatelySP) {
                 for (i in mMap.values) {
                     i.apply {
@@ -66,11 +51,11 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
                 }
                 val count = repository.updateAllPasswords(mMap.values.toList())
                 withContext(Dispatchers.Main) {
-                    if (sp.getInt(cf.spTimeDelete, CommonFunctions.TimeDeleteMonthSP) !=
+                    if (sp.getInt(CommonFunctions.spTimeDelete, CommonFunctions.TimeDeleteMonthSP) !=
                         CommonFunctions.TimeDeleteImmediatelySP) {
-                        cf.toast(context, "Добавлено в корзину: $count")
+                        CommonFunctions.toast(context, "Добавлено в корзину: $count")
                     } else {
-                        cf.toast(context, "Удалено: $count")
+                        CommonFunctions.toast(context, "Удалено: $count")
                     }
                 }
             } else {
@@ -106,5 +91,9 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
 
     fun getRecyclerViewState(): LinearLayoutManager.SavedState? {
         return savedStateHandle.get(KEY_RECYCLER_VIEW)
+    }
+
+    companion object {
+        private const val KEY_RECYCLER_VIEW = "key_recycler_view"
     }
 }

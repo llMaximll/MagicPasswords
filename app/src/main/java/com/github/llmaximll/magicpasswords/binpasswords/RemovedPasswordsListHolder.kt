@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.adaptersholders
+package com.github.llmaximll.magicpasswords.binpasswords
 
 import android.view.MotionEvent
 import android.view.View
@@ -6,17 +6,15 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.model.PasswordInfo
 import com.github.llmaximll.magicpasswords.states.ListState
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
-import com.github.llmaximll.magicpasswords.vm.RecycleBinVM
 import java.util.*
-
-private const val TAG = "RemovedPasswordsListHolder"
 
 class RemovedPasswordsListHolder(
     itemView: View,
-    private val viewModel: RecycleBinVM)
+    private val viewModel: RecycleBinVM
+)
     : RecyclerView.ViewHolder(itemView),
     View.OnTouchListener,
     View.OnLongClickListener
@@ -26,7 +24,6 @@ class RemovedPasswordsListHolder(
     private val descriptionTextView: TextView = itemView.findViewById(R.id.description_textView)
     private val dateTextView: TextView = itemView.findViewById(R.id.date_textView)
     private val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
-    private val cf = CommonFunctions.get()
 
     init {
         itemView.apply {
@@ -35,10 +32,7 @@ class RemovedPasswordsListHolder(
         }
     }
 
-    fun bind(
-        passwordInfo: PasswordInfo,
-        position: Int
-    ) {
+    fun bind(passwordInfo: PasswordInfo) {
         this.passwordInfo = passwordInfo
         nameTextView.text = passwordInfo.name
         descriptionTextView.text = passwordInfo.description
@@ -99,13 +93,13 @@ class RemovedPasswordsListHolder(
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                cf.animateView(itemView, false, zChange = true)
+                CommonFunctions.animateView(itemView, false, zChange = true)
             }
             MotionEvent.ACTION_CANCEL -> {
-                cf.animateView(itemView, true, zChange = true)
+                CommonFunctions.animateView(itemView, true, zChange = true)
             }
             MotionEvent.ACTION_UP -> {
-                cf.animateView(itemView, true, zChange = true)
+                CommonFunctions.animateView(itemView, true, zChange = true)
                 if (viewModel.selectedDataFlow.value is ListState.SELECTED) {
                     checkBox.isChecked = !checkBox.isChecked
                     if (checkBox.isChecked) {

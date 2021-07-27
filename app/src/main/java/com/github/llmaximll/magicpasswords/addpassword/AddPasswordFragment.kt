@@ -1,75 +1,52 @@
-package com.github.llmaximll.magicpasswords.fragments
+package com.github.llmaximll.magicpasswords.addpassword
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.InputType
+import android.transition.Slide
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.github.llmaximll.magicpasswords.Encryption
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
-import com.github.llmaximll.magicpasswords.databinding.FragmentChangePasswordBinding
+import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.databinding.FragmentAddPasswordBinding
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
-import com.github.llmaximll.magicpasswords.vm.ChangePasswordVM
+import com.google.android.material.transition.platform.MaterialContainerTransform
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
 
-private const val TAG = "ChangePasswordFragment"
+class AddPasswordFragment : Fragment() {
 
-class ChangePasswordFragment : Fragment() {
-
-    private lateinit var binding: FragmentChangePasswordBinding
-    private lateinit var viewModel: ChangePasswordVM
-    private lateinit var cf: CommonFunctions
-    private lateinit var idPassword: UUID
-    private var name = ""
-    private var password = ""
-    private var description = ""
+    private lateinit var binding: FragmentAddPasswordBinding
+    private lateinit var viewModel: AddPasswordVM
     private var passwordFormat = PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
     private var difficultPassword = 15
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        cf = CommonFunctions.get()
-        //arguments
-        idPassword = try {
-            UUID.fromString(arguments?.getString(ARG_ID_PASSWORD))
-        } catch (e: Exception) {
-            cf.toast(requireContext(), "Ошибка загрузки пароля")
-            requireActivity().onBackPressed()
-            UUID.randomUUID()
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentChangePasswordBinding.inflate(inflater, container, false)
+        binding = FragmentAddPasswordBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
-        binding.changeButton.setOnClickListener {
-            name = binding.nameEditText.text.toString()
-            password = binding.passwordEditText.text.toString()
+        binding.addButton.setOnClickListener {
+            val name = binding.nameEditText.text.toString()
+            val password = binding.passwordEditText.text.toString()
             val password2 = binding.passwordEditText2.text.toString()
-            description = binding.descriptionEditText.text.toString()
+            val description = binding.descriptionEditText.text.toString()
             val address = binding.addressEditText.text.toString()
             if (viewModel.checkFields(requireContext(), name, password, password2)) {
-                viewModel.updatePassword(
+                viewModel.addPassword(
                     PasswordInfo(
-                        id = idPassword,
                         name = name,
                         password = password,
                         description = description,
@@ -95,8 +72,7 @@ class ChangePasswordFragment : Fragment() {
                 binding.passwordEditText2.setText(password)
             } else {
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    val enc = Encryption()
-                    val newPassword = enc.encrypt(binding.messageEditText2.text.toString(), requireContext())
+                    val newPassword = Encryption.encrypt(binding.messageEditText2.text.toString(), requireContext())
                     withContext(Dispatchers.Main) {
                         binding.passwordEditText.setText("$newPassword")
                         binding.passwordEditText2.setText("$newPassword")
@@ -154,41 +130,27 @@ class ChangePasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = cf.initViewModel(this, ChangePasswordVM::class.java) as ChangePasswordVM
-        if (this::idPassword.isInitialized) {
-            restorePassword()
-        }
-        //Другое
+        viewModel = CommonFunctions.initViewModel(this, AddPasswordVM::class.java) as AddPasswordVM
+        // Другое
         binding.withoutRadioButton.isChecked = true
-    }
-
-    private fun restorePassword() {
-        viewModel.getPasswordInfo(idPassword)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.passwordInfoFlow
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect {
-                    binding.nameEditText.setText(it?.name)
-                    binding.passwordEditText.setText(it?.password)
-                    binding.passwordEditText2.setText(it?.password)
-                    binding.descriptionEditText.setText(it?.description)
-                    binding.addressEditText.setText(it?.address)
-                    difficultPassword = it?.password?.length ?: 0
-                    binding.countSymbolsTextView.hint = "Количество знаков: $difficultPassword"
-                    if (it?.messagePassword == true) {
-                        binding.messageRadioButton.isChecked = true
-                        val en = Encryption()
-                        binding.messageEditText2.setText(en.decrypt(it.password, requireContext()))
-                    }
-                }
+        //transition
+        enterTransition = MaterialContainerTransform().apply {
+            startView = requireActivity().findViewById(R.id.add_password_fab)
+            endView = binding.cardView
+            duration = resources.getInteger(android.R.integer.config_longAnimTime).toLong()
+            scrimColor = Color.TRANSPARENT
+            containerColor = Color.WHITE
+            startContainerColor = Color.parseColor("#03DAC5")
+            endContainerColor = Color.WHITE
         }
-        binding.changeButton.visibility = View.VISIBLE
+        returnTransition = Slide().apply {
+            duration = resources.getInteger(android.R.integer.config_longAnimTime).toLong()
+            addTarget(R.id.cardView)
+        }
     }
 
     companion object {
         const val PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS = 0
         const val PASSWORD_FORMAT_WITH_SPEC_SYMBOLS = 1
-        // Аргументы
-        const val ARG_ID_PASSWORD = "arg_id_password"
     }
 }

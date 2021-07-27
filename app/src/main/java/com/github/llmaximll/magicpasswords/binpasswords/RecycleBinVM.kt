@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.vm
+package com.github.llmaximll.magicpasswords.binpasswords
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkManager
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.model.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import com.github.llmaximll.magicpasswords.states.ListState
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
@@ -16,11 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private const val TAG = "RecycleBinVM"
-private const val KEY_RECYCLER_VIEW_REMOVED = "key_recycler_view"
-
 class RecycleBinVM(state: SavedStateHandle) : ViewModel() {
-    private val cf = CommonFunctions.get()
     private val repository = MagicRepository.get()
     private val savedStateHandle = state
     private val passwordsListDataFlow = MutableStateFlow<List<PasswordInfo>?>(null)
@@ -50,9 +46,9 @@ class RecycleBinVM(state: SavedStateHandle) : ViewModel() {
             for (el in mMap.values) {
                 tagList += "{$el}"
             }
-            cf.cancelAllWorkByTag(workManager, tagList)
+            CommonFunctions.cancelAllWorkByTag(workManager, tagList)
             withContext(Dispatchers.Main) {
-                cf.toast(context, "Восстановлено: $count")
+                CommonFunctions.toast(context, "Восстановлено: $count")
             }
         }
     }
@@ -65,9 +61,9 @@ class RecycleBinVM(state: SavedStateHandle) : ViewModel() {
             for (el in mMap.values) {
                 tagList += "{$el}"
             }
-            cf.cancelAllWorkByTag(workManager, tagList)
+            CommonFunctions.cancelAllWorkByTag(workManager, tagList)
             withContext(Dispatchers.Main) {
-                cf.toast(context, "Удалено: $count")
+                CommonFunctions.toast(context, "Удалено: $count")
             }
         }
     }
@@ -78,5 +74,9 @@ class RecycleBinVM(state: SavedStateHandle) : ViewModel() {
 
     fun getRecyclerViewState(): LinearLayoutManager.SavedState? {
         return savedStateHandle.get(KEY_RECYCLER_VIEW_REMOVED)
+    }
+
+    companion object {
+        private const val KEY_RECYCLER_VIEW_REMOVED = "key_recycler_view"
     }
 }

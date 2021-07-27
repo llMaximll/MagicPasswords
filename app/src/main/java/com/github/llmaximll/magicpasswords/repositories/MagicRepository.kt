@@ -1,18 +1,13 @@
 package com.github.llmaximll.magicpasswords.repositories
 
 import android.content.Context
-import android.text.Editable
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
-import com.github.llmaximll.magicpasswords.data.PasswordInfoFts
+import com.github.llmaximll.magicpasswords.model.PasswordInfo
 import com.github.llmaximll.magicpasswords.database.MagicDatabase
-import com.github.llmaximll.magicpasswords.fragments.ChangePasswordFragment
 import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import java.util.*
-
-private const val DATABASE_NAME = "MagicDatabase"
 
 class MagicRepository private constructor(context: Context) {
 
@@ -32,36 +27,23 @@ class MagicRepository private constructor(context: Context) {
     private val magicDao = database.magicDao()
 
     fun generateSecretKey(context: Context) {
-        val cf = CommonFunctions.get()
-        val sp = cf.getSharedPreferences(context)
-        val secretKey: String? = sp.getString(cf.spSecretKey, null)
+        val sp = CommonFunctions.getSharedPreferences(context)
+        val secretKey: String? = sp.getString(CommonFunctions.spSecretKey, null)
         if (secretKey == null) {
             val editor = sp.edit()
             editor.putString(
-                cf.spSecretKey,
-                generatePassword(45, ChangePasswordFragment.PASSWORD_FORMAT_WITH_SPEC_SYMBOLS)
+                CommonFunctions.spSecretKey,
+                generatePassword()
             )
             editor.apply()
         }
     }
 
-    fun generatePassword(
-        count: Int,
-        passwordFormat: Int = ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS
-    ): String {
-        val dict = when (passwordFormat) {
-            ChangePasswordFragment.PASSWORD_FORMAT_WITHOUT_SPEC_SYMBOLS -> {
-                "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            }
-            ChangePasswordFragment.PASSWORD_FORMAT_WITH_SPEC_SYMBOLS -> {
-                "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\\/^&%$#@_-"
-            } else -> {
-                "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            }
-        }
+    private fun generatePassword(): String {
+        val dict = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\\/^&%$#@_-"
         val rnd = Random()
         val password = StringBuilder()
-        for (i in 0..count) {
+        for (i in 0..45) {
             password.append(dict[rnd.nextInt(dict.length)])
         }
         return password.toString()
@@ -117,5 +99,6 @@ class MagicRepository private constructor(context: Context) {
                 "MagicRepository must be initialized"
             }
         }
+        private const val DATABASE_NAME = "MagicDatabase"
     }
 }

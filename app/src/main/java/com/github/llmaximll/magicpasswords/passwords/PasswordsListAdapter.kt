@@ -1,19 +1,18 @@
-package com.github.llmaximll.magicpasswords.adaptersholders
+package com.github.llmaximll.magicpasswords.passwords
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.data.PasswordInfo
-import com.github.llmaximll.magicpasswords.fragments.PasswordsListFragment
+import com.github.llmaximll.magicpasswords.model.PasswordInfo
 import com.github.llmaximll.magicpasswords.states.ListState
-import com.github.llmaximll.magicpasswords.vm.PasswordsListVM
 
 class PasswordsListAdapter(
     private val callbacks: PasswordsListFragment.Callbacks?,
     private var passwordsList: MutableList<PasswordInfo>,
-    private val viewModel: PasswordsListVM) :
+    private val viewModel: PasswordsListVM
+) :
     RecyclerView.Adapter<PasswordsListHolder>() {
 
     private lateinit var view: View
