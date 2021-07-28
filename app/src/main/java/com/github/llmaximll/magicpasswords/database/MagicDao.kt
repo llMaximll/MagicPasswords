@@ -1,7 +1,7 @@
 package com.github.llmaximll.magicpasswords.database
 
 import androidx.room.*
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import java.util.*
 
 @Dao

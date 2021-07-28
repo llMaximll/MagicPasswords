@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords
+package com.github.llmaximll.magicpasswords.ui.nav
 
 import android.os.Bundle
 import android.view.LayoutInflater

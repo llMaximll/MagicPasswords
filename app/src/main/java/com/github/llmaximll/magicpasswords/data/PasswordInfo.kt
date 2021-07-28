@@ -1,8 +1,8 @@
-package com.github.llmaximll.magicpasswords.model
+package com.github.llmaximll.magicpasswords.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.Common
 import java.util.*
 
 @Entity
@@ -14,6 +14,6 @@ data class PasswordInfo(
     val description: String = "",
     var removed: Int = 0,
     var removedDate: Long = 0L,
-    var removedFormat: Int = CommonFunctions.TimeDeleteMonthSP,
+    var removedFormat: Int = Common.TimeDeleteMonthSP,
     var messagePassword: Boolean = false
 )

@@ -6,12 +6,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.DialogRecoveryBackupBinding
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import com.github.llmaximll.magicpasswords.states.BottomBarAndFabState
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.Common
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -46,7 +45,7 @@ class MainActivityVM : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 repository.addAllPasswords(passwordsList)
             }
-            CommonFunctions.toast(context, "Пароли были добавлены")
+            Common.toast(context, "Пароли были добавлены")
             dialog.dismiss()
         }
 

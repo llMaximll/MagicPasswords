@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.addpassword
+package com.github.llmaximll.magicpasswords.ui.addpassword
 
 import android.graphics.Color
 import android.os.Bundle
@@ -10,11 +10,11 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.github.llmaximll.magicpasswords.Encryption
+import com.github.llmaximll.magicpasswords.utils.Encryption
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentAddPasswordBinding
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.Common
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -130,7 +130,7 @@ class AddPasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = CommonFunctions.initViewModel(this, AddPasswordVM::class.java) as AddPasswordVM
+        viewModel = Common.initViewModel(this, AddPasswordVM::class.java) as AddPasswordVM
         // Другое
         binding.withoutRadioButton.isChecked = true
         //transition

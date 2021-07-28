@@ -1,8 +1,7 @@
-package com.github.llmaximll.magicpasswords
+package com.github.llmaximll.magicpasswords.utils
 
 import android.content.Context
 import android.util.Base64
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
@@ -20,8 +19,8 @@ object Encryption {
     suspend fun encrypt(strToEncrypt: String, context: Context) :  String? {
         return suspendCoroutine { cont ->
             try {
-                val sp = CommonFunctions.getSharedPreferences(context)
-                val mySecretKey: String? = sp.getString(CommonFunctions.spSecretKey, null)
+                val sp = Common.getSharedPreferences(context)
+                val mySecretKey: String? = sp.getString(Common.spSecretKey, null)
                 val ivParameterSpec = IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
 
                 val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
@@ -47,8 +46,8 @@ object Encryption {
 
     fun decrypt(strToDecrypt : String, context: Context) : String? {
         try {
-            val sp = CommonFunctions.getSharedPreferences(context)
-            val mySecretKey: String? = sp.getString(CommonFunctions.spSecretKey, null)
+            val sp = Common.getSharedPreferences(context)
+            val mySecretKey: String? = sp.getString(Common.spSecretKey, null)
             val ivParameterSpec =  IvParameterSpec(Base64.decode(iv, Base64.DEFAULT))
 
             val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")

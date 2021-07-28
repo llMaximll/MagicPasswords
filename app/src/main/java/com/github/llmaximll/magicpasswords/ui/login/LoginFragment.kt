@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.login
+package com.github.llmaximll.magicpasswords.ui.login
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -14,7 +14,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.Common
 import com.github.llmaximll.magicpasswords.databinding.FragmentLoginBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,14 +42,14 @@ class LoginFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sp = CommonFunctions.getSharedPreferences(requireContext())
-        fingerprint = sp.getBoolean(CommonFunctions.spFingerPrint, false)
+        sp = Common.getSharedPreferences(requireContext())
+        fingerprint = sp.getBoolean(Common.spFingerPrint, false)
         //arguments
         firstLaunch = arguments?.getBoolean(ARG_FIRST_LAUNCH, false) ?: false
         secondPassword = arguments?.getString(ARG_SECOND_PASSWORD, "") ?: ""
-        CommonFunctions.log(TAG, "arguments | firstLaunch=$firstLaunch")
+        Common.log(TAG, "arguments | firstLaunch=$firstLaunch")
         //auth
-        if (sp.getBoolean(CommonFunctions.spFingerPrint, false)) {
+        if (sp.getBoolean(Common.spFingerPrint, false)) {
             showFingerprint(false)
         }
     }
@@ -107,30 +107,30 @@ class LoginFragment : Fragment() {
                             callbacks?.onLoginFragment(null)
                         } else {
                             val editor = sp.edit()
-                            editor.putBoolean(CommonFunctions.spFingerPrint, true)
-                            editor.putBoolean(CommonFunctions.spFirstLaunch, true)
-                            editor.putString(CommonFunctions.spPassword, password)
+                            editor.putBoolean(Common.spFingerPrint, true)
+                            editor.putBoolean(Common.spFirstLaunch, true)
+                            editor.putString(Common.spPassword, password)
                             editor.apply()
                             binding.circle1ImageView.setBackgroundResource(R.drawable.circle_password_green)
                             binding.circle2ImageView.setBackgroundResource(R.drawable.circle_password_green)
                             binding.circle3ImageView.setBackgroundResource(R.drawable.circle_password_green)
                             binding.circle4ImageView.setBackgroundResource(R.drawable.circle_password_green)
                             callbacks?.onLoginFragment(null)
-                            CommonFunctions.toast(requireContext(), "Настройки сохранены")
+                            Common.toast(requireContext(), "Настройки сохранены")
                         }
                     }
 
                     override fun onAuthenticationFailed() {
                         super.onAuthenticationFailed()
                         if (!mode) {
-                            CommonFunctions.toast(requireContext(), "Вход не удался")
+                            Common.toast(requireContext(), "Вход не удался")
                         } else {
                             val editor = sp.edit()
-                            editor.putBoolean(CommonFunctions.spFirstLaunch, true)
-                            editor.putString(CommonFunctions.spPassword, password)
+                            editor.putBoolean(Common.spFirstLaunch, true)
+                            editor.putString(Common.spPassword, password)
                             editor.apply()
                             callbacks?.onLoginFragment(null)
-                            CommonFunctions.toast(requireContext(), "Настройки сохранены")
+                            Common.toast(requireContext(), "Настройки сохранены")
                         }
                     }
 
@@ -139,11 +139,11 @@ class LoginFragment : Fragment() {
 
                         if (mode) {
                             val editor = sp.edit()
-                            editor.putBoolean(CommonFunctions.spFirstLaunch, true)
-                            editor.putString(CommonFunctions.spPassword, password)
+                            editor.putBoolean(Common.spFirstLaunch, true)
+                            editor.putString(Common.spPassword, password)
                             editor.apply()
                             callbacks?.onLoginFragment(null)
-                            CommonFunctions.toast(requireContext(), "Настройки сохранены")
+                            Common.toast(requireContext(), "Настройки сохранены")
                         }
                     }
                 })
@@ -218,26 +218,26 @@ class LoginFragment : Fragment() {
                     if (password == secondPassword) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             if (requireContext().packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT) &&
-                                !sp.getBoolean(CommonFunctions.spFingerPrint, false)) {
+                                !sp.getBoolean(Common.spFingerPrint, false)) {
                                 showFingerprint(true)
                             }
                         } else {
                             val editor = sp.edit()
-                            editor.putBoolean(CommonFunctions.spFirstLaunch, true)
-                            editor.putString(CommonFunctions.spPassword, password)
+                            editor.putBoolean(Common.spFirstLaunch, true)
+                            editor.putString(Common.spPassword, password)
                             editor.apply()
                             callbacks?.onLoginFragment(null)
-                            CommonFunctions.toast(requireContext(), "Настройки сохранены")
+                            Common.toast(requireContext(), "Настройки сохранены")
                         }
                     } else {
-                        CommonFunctions.toast(requireContext(), "Пароли не совпадают")
+                        Common.toast(requireContext(), "Пароли не совпадают")
                     }
                 } else {
                     callbacks?.onLoginFragment(password)
                 }
             } else {
-                sp = CommonFunctions.getSharedPreferences(requireContext())
-                val correctPassword = sp.getString(CommonFunctions.spPassword, "")
+                sp = Common.getSharedPreferences(requireContext())
+                val correctPassword = sp.getString(Common.spPassword, "")
                 if (password == correctPassword) {
                     binding.circle1ImageView.setBackgroundResource(R.drawable.circle_password_green)
                     binding.circle2ImageView.setBackgroundResource(R.drawable.circle_password_green)
@@ -245,7 +245,7 @@ class LoginFragment : Fragment() {
                     binding.circle4ImageView.setBackgroundResource(R.drawable.circle_password_green)
                     callbacks?.onLoginFragment(null)
                 } else {
-                    CommonFunctions.toast(requireContext(), "Неверный пароль")
+                    Common.toast(requireContext(), "Неверный пароль")
                 }
             }
         }

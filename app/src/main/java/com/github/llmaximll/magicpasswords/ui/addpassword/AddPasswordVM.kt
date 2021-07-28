@@ -1,31 +1,22 @@
-package com.github.llmaximll.magicpasswords.changepassword
+package com.github.llmaximll.magicpasswords.ui.addpassword
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.ui.changepassword.ChangePasswordFragment
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
+import com.github.llmaximll.magicpasswords.utils.Common
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
-class ChangePasswordVM : ViewModel() {
+class AddPasswordVM : ViewModel() {
     private val repository = MagicRepository.get()
-    private val passwordInfoDataFlow = MutableStateFlow<PasswordInfo?>(null)
-    val passwordInfoFlow = passwordInfoDataFlow.asStateFlow()
 
-    fun updatePassword(passwordInfo: PasswordInfo) {
+    fun addPassword(passwordInfo: PasswordInfo) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updatePassword(passwordInfo)
-        }
-    }
-
-    fun getPasswordInfo(idPassword: UUID) {
-        viewModelScope.launch(Dispatchers.IO) {
-            passwordInfoDataFlow.value = repository.getPasswordInfo(idPassword)
+            repository.addPassword(passwordInfo)
         }
     }
 
@@ -37,20 +28,20 @@ class ChangePasswordVM : ViewModel() {
     ): Boolean {
         when {
             name.isEmpty() -> {
-                CommonFunctions.toast(context,"Поле \"Название\" пустое")
+                Common.toast(context,"Поле \"Название\" пустое")
                 return false
             }
             password.isEmpty() -> {
-                CommonFunctions.toast(context,"Поле \"Пароль\" пустое")
+                Common.toast(context,"Поле \"Пароль\" пустое")
                 return false
             }
             password2.isEmpty() -> {
-                CommonFunctions.toast(context,"Поле \"Пароль 2\" пустое")
+                Common.toast(context,"Поле \"Пароль 2\" пустое")
                 return false
             }
         }
         if (password != password2) {
-            CommonFunctions.toast(context,"Пароли не совпадают")
+            Common.toast(context,"Пароли не совпадают")
             return false
         }
         return true

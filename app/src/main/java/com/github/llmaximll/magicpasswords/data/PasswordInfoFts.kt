@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.model
+package com.github.llmaximll.magicpasswords.data
 
 import androidx.room.Entity
 import androidx.room.Fts4

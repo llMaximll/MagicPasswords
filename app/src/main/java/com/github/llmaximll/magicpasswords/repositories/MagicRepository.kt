@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.database.MagicDatabase
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.Common
 import java.util.*
 
 class MagicRepository private constructor(context: Context) {
@@ -27,12 +27,12 @@ class MagicRepository private constructor(context: Context) {
     private val magicDao = database.magicDao()
 
     fun generateSecretKey(context: Context) {
-        val sp = CommonFunctions.getSharedPreferences(context)
-        val secretKey: String? = sp.getString(CommonFunctions.spSecretKey, null)
+        val sp = Common.getSharedPreferences(context)
+        val secretKey: String? = sp.getString(Common.spSecretKey, null)
         if (secretKey == null) {
             val editor = sp.edit()
             editor.putString(
-                CommonFunctions.spSecretKey,
+                Common.spSecretKey,
                 generatePassword()
             )
             editor.apply()

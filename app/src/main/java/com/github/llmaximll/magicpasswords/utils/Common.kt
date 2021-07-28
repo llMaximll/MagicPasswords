@@ -1,7 +1,5 @@
 package com.github.llmaximll.magicpasswords.utils
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
@@ -22,7 +20,7 @@ import com.github.llmaximll.magicpasswords.background.DeletePasswordWorker
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 
-object CommonFunctions {
+object Common {
 
     private const val SP_NAME = "sp_magic_passwords"
 
@@ -138,36 +136,6 @@ object CommonFunctions {
             }
             .replace(containerViewId, fragment)
             .commit()
-    }
-
-    fun animateView(view: View, reverse: Boolean, zChange: Boolean, countValue: Float = 0.95f) {
-        if (!reverse) {
-            val animatorX = ObjectAnimator.ofFloat(view, "scaleX", countValue)
-            val animatorY = ObjectAnimator.ofFloat(view, "scaleY", countValue)
-            AnimatorSet().apply {
-                playTogether(animatorX, animatorY)
-                duration = 150
-                start()
-            }
-            if (zChange) {
-                view.animate().apply {
-                    translationZ(10f)
-                }.start()
-            }
-        } else {
-            val animatorX = ObjectAnimator.ofFloat(view, "scaleX", 1.0f)
-            val animatorY = ObjectAnimator.ofFloat(view, "scaleY", 1.0f)
-            AnimatorSet().apply {
-                playTogether(animatorX, animatorY)
-                duration = 150
-                start()
-            }
-            if (zChange) {
-                view.animate().apply {
-                    translationZ(0f)
-                }.start()
-            }
-        }
     }
 
     fun getSharedPreferences(context: Context): SharedPreferences {

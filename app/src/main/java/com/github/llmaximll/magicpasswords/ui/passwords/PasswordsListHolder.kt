@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.binpasswords
+package com.github.llmaximll.magicpasswords.ui.passwords
 
 import android.view.MotionEvent
 import android.view.View
@@ -6,53 +6,38 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.states.ListState
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
-import java.util.*
+import com.github.llmaximll.magicpasswords.utils.Animation
 
-class RemovedPasswordsListHolder(
+class PasswordsListHolder(
     itemView: View,
-    private val viewModel: RecycleBinVM
-)
-    : RecyclerView.ViewHolder(itemView),
+    private val viewModel: PasswordsListVM
+) :
+    RecyclerView.ViewHolder(itemView),
     View.OnTouchListener,
-    View.OnLongClickListener
-{
+    View.OnLongClickListener {
     private lateinit var passwordInfo: PasswordInfo
     private val nameTextView: TextView = itemView.findViewById(R.id.name_textView)
     private val descriptionTextView: TextView = itemView.findViewById(R.id.description_textView)
-    private val dateTextView: TextView = itemView.findViewById(R.id.date_textView)
     private val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
+    private var callbacks: PasswordsListFragment.Callbacks? = null
 
     init {
-        itemView.apply {
-            setOnTouchListener(this@RemovedPasswordsListHolder)
-            setOnLongClickListener(this@RemovedPasswordsListHolder)
-        }
+        itemView.setOnTouchListener(this)
+        itemView.setOnLongClickListener(this)
     }
 
-    fun bind(passwordInfo: PasswordInfo) {
+    fun bind(
+        callbacks: PasswordsListFragment.Callbacks?,
+        passwordInfo: PasswordInfo
+    ) {
+        this.callbacks = callbacks
         this.passwordInfo = passwordInfo
         nameTextView.text = passwordInfo.name
         descriptionTextView.text = passwordInfo.description
-        val calendar = Calendar.getInstance()
-        calendar.time = Date(passwordInfo.removedDate)
-        val currentCalendar = Calendar.getInstance()
-        when (passwordInfo.removedFormat) {
-            CommonFunctions.TimeDeleteDaySP -> {
-                val hours = currentCalendar.get(Calendar.HOUR_OF_DAY) - calendar.get(Calendar.HOUR_OF_DAY)
-                dateTextView.text = "До удаления: ${24 - hours} часов"
-            }
-            CommonFunctions.TimeDeleteWeakSP -> {
-                val days = currentCalendar.get(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH)
-                dateTextView.text = "До удаления: ${7 - days} дней"
-            }
-            CommonFunctions.TimeDeleteMonthSP -> {
-                val minutes = currentCalendar.get(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH)
-                dateTextView.text = "До удаления: ${30 - minutes} дней"
-            }
-        }
+        //transition
+        itemView.transitionName = "transition_$adapterPosition"
         if (viewModel.selectedDataFlow.value is ListState.SELECTED) {
             if (viewModel.setAllDataFlow.value) {
                 checkBox.isChecked = true
@@ -93,13 +78,19 @@ class RemovedPasswordsListHolder(
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                CommonFunctions.animateView(itemView, false, zChange = true)
+                Animation.animateView(itemView, false, zChange = true)
             }
             MotionEvent.ACTION_CANCEL -> {
-                CommonFunctions.animateView(itemView, true, zChange = true)
+                Animation.animateView(itemView, true, zChange = true)
             }
             MotionEvent.ACTION_UP -> {
-                CommonFunctions.animateView(itemView, true, zChange = true)
+                Animation.animateView(itemView, true, zChange = true)
+                if (viewModel.selectedDataFlow.value is ListState.UNSELECTED) {
+                    callbacks?.onPasswordsListFragmentChangePassword(
+                        passwordInfo.id.toString(),
+                        itemView
+                    )
+                }
                 if (viewModel.selectedDataFlow.value is ListState.SELECTED) {
                     checkBox.isChecked = !checkBox.isChecked
                     if (checkBox.isChecked) {

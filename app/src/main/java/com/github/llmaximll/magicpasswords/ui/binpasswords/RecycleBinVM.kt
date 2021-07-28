@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.binpasswords
+package com.github.llmaximll.magicpasswords.ui.binpasswords
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
@@ -6,10 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.WorkManager
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import com.github.llmaximll.magicpasswords.states.ListState
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.Common
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,9 +46,9 @@ class RecycleBinVM(state: SavedStateHandle) : ViewModel() {
             for (el in mMap.values) {
                 tagList += "{$el}"
             }
-            CommonFunctions.cancelAllWorkByTag(workManager, tagList)
+            Common.cancelAllWorkByTag(workManager, tagList)
             withContext(Dispatchers.Main) {
-                CommonFunctions.toast(context, "Восстановлено: $count")
+                Common.toast(context, "Восстановлено: $count")
             }
         }
     }
@@ -61,9 +61,9 @@ class RecycleBinVM(state: SavedStateHandle) : ViewModel() {
             for (el in mMap.values) {
                 tagList += "{$el}"
             }
-            CommonFunctions.cancelAllWorkByTag(workManager, tagList)
+            Common.cancelAllWorkByTag(workManager, tagList)
             withContext(Dispatchers.Main) {
-                CommonFunctions.toast(context, "Удалено: $count")
+                Common.toast(context, "Удалено: $count")
             }
         }
     }

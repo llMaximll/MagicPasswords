@@ -1,53 +1,39 @@
-package com.github.llmaximll.magicpasswords.passwords
+package com.github.llmaximll.magicpasswords.ui.binpasswords
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
-import com.github.llmaximll.magicpasswords.databinding.FragmentPasswordsListBinding
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.databinding.FragmentRecycleBinBinding
 import com.github.llmaximll.magicpasswords.states.ListState
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
-import kotlinx.coroutines.Dispatchers
+import com.github.llmaximll.magicpasswords.utils.Common
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.*
 
-class PasswordsListFragment : Fragment() {
+class RecycleBinFragment : Fragment() {
 
-    interface Callbacks {
-        fun onPasswordsListFragmentChangePassword(idPassword: String, transitionView: View)
-        fun onPasswordsListFragmentSelected(state: Boolean)
-        fun onPasswordsListFragmentOnTouchPassword()
-    }
-
-    lateinit var binding: FragmentPasswordsListBinding
-    private lateinit var adapter: PasswordsListAdapter
+    private lateinit var binding: FragmentRecycleBinBinding
+    private lateinit var viewModel: RecycleBinVM
+    private lateinit var adapter: RemovedPasswordsListAdapter
     private var recyclerViewState: Parcelable? = null
-    private var callbacks: Callbacks? = null
-
-    lateinit var viewModel: PasswordsListVM
 
     private val backPressedDispatcher = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            this@PasswordsListFragment.onBackPressed()
+            this@RecycleBinFragment.onBackPressed()
         }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        callbacks = context as Callbacks
     }
 
     override fun onCreateView(
@@ -55,31 +41,33 @@ class PasswordsListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPasswordsListBinding.inflate(inflater, container, false)
+        binding = FragmentRecycleBinBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = CommonFunctions.initViewModel(this, PasswordsListVM::class.java) as PasswordsListVM
+        viewModel = Common.initViewModel(this, RecycleBinVM::class.java) as RecycleBinVM
+        //Другое
         recyclerViewState = viewModel.getRecyclerViewState()
+
+        setToolBar()
         if (viewModel.passwordsList.isEmpty()) {
-            viewModel.getAllPasswords(0)
+            getAllPasswords()
         } else {
             setRecyclerView(viewModel.passwordsList)
         }
-        setToolBar()
         isSelectedFragment()
-        // Back button
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedDispatcher)
         // Transition
-        postponeEnterTransition()
-        view.doOnPreDraw { startPostponedEnterTransition() }
+        enterTransition = MaterialFadeThrough().apply {
+            duration = resources.getInteger(R.integer.material_motion_duration_medium_1).toLong()
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.getAllPasswords(0)
+    override fun onPause() {
+        super.onPause()
+        recyclerViewState = binding.passwordsRecyclerView.layoutManager?.onSaveInstanceState()
+        viewModel.saveRecyclerViewState(recyclerViewState as LinearLayoutManager.SavedState?)
     }
 
     private fun onBackPressed() {
@@ -91,36 +79,47 @@ class PasswordsListFragment : Fragment() {
         }
     }
 
-    override fun onPause() {
-        recyclerViewState = binding.passwordsRecyclerView.layoutManager?.onSaveInstanceState()
-        viewModel.saveRecyclerViewState(recyclerViewState as LinearLayoutManager.SavedState?)
-        super.onPause()
+    private fun getAllPasswords() {
+        viewModel.getAllPasswords(1)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.passwordsListFlow
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { passwordsList ->
+                if (passwordsList != null) {
+                    viewModel.passwordsList.clear()
+                    viewModel.passwordsList.addAll(passwordsList.toMutableList())
+                    setRecyclerView(passwordsList)
+                }
+            }
+        }
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        callbacks = null
-    }
-
-    private fun setToolBar(toolBar: Toolbar = binding.toolBar) {
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setToolBar(toolBar: androidx.appcompat.widget.Toolbar = binding.toolBar) {
         toolBar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.delete_passwords -> {
                     if (viewModel.selectedPasswordsMMap.isNotEmpty()) {
                         viewModel.deletePasswords(viewModel.selectedPasswordsMMap, requireContext())
-                        val idList = mutableListOf<String>()
-                        viewModel.selectedPasswordsMMap.values.forEach {
-                            idList.add("${it.id}")
-                        }
-                        CommonFunctions.deletePasswordWorkManager(
-                            requireContext(),
-                            idList
-                        )
                         viewModel.passwordsList.removeAll(viewModel.selectedPasswordsMMap.values)
                         setRecyclerView(viewModel.passwordsList)
                         viewModel.selectedDataFlow.value = ListState.UNSELECTED
                     } else {
-                        CommonFunctions.toast(requireContext(), "Не выбраны элементы списка")
+                        Common.toast(requireContext(), "Не выбраны элементы списка")
+                    }
+                }
+                R.id.recover_passwords -> {
+                    if (viewModel.selectedPasswordsMMap.isNotEmpty()) {
+                        viewModel.passwordsList.removeAll(viewModel.selectedPasswordsMMap.values)
+                        viewModel.selectedPasswordsMMap.values.forEach { pass ->
+                            pass.removed = 0
+                            pass.removedDate = 0L
+                        }
+                        viewModel.recoverPasswords(viewModel.selectedPasswordsMMap, requireContext())
+                        setRecyclerView(viewModel.passwordsList)
+                        viewModel.selectedDataFlow.value = ListState.UNSELECTED
+                    } else {
+                        Common.toast(requireContext(), "Не выбраны элементы списка")
                     }
                 }
                 R.id.select_all -> {
@@ -131,50 +130,38 @@ class PasswordsListFragment : Fragment() {
         }
     }
 
-    fun onSearch(newText: String?) {
-        if (newText != null) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                viewModel.getRelevantPasswords(newText)
-            }
-        }
-    }
-
     private fun setRecyclerView(passwordsList: List<PasswordInfo>) {
         val rV = binding.passwordsRecyclerView
         rV.layoutManager = LinearLayoutManager(requireContext())
-        //Восстановление состояния RecyclerView
-        binding.passwordsRecyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
-
-        adapter = PasswordsListAdapter(
-            callbacks,
+        rV.layoutManager?.onRestoreInstanceState(recyclerViewState)
+        adapter = RemovedPasswordsListAdapter(
             passwordsList.toMutableList(),
             viewModel
         )
         rV.adapter = adapter
     }
-
+    /**
+     * В зависимости от переменной selected функция выполняет то или иное состояние фрагмента (внешний вид)
+     */
     @SuppressLint("NotifyDataSetChanged")
     private fun isSelectedFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.selectedDataFlow
                         .collect { state ->
                             binding.toolBar.menu.run {
                                 findItem(R.id.delete_passwords).isVisible = state is ListState.SELECTED
+                                findItem(R.id.recover_passwords).isVisible = state is ListState.SELECTED
                                 findItem(R.id.select_all).isVisible = state is ListState.SELECTED
-                            }
-                            if (state is ListState.SELECTED) {
-                                backPressedDispatcher.isEnabled = true
                             }
                             if (state is ListState.UNSELECTED) {
                                 viewModel.selectedPasswordsMMap.clear()
                                 viewModel.setAllDataFlow.value = false
                             }
-                            if (this@PasswordsListFragment::adapter.isInitialized) {
+                            if (this@RecycleBinFragment::adapter.isInitialized) {
                                 adapter.notifyDataSetChanged()
                             }
-                            callbacks?.onPasswordsListFragmentSelected(state is ListState.SELECTED)
                         }
                 }
                 launch {
@@ -185,22 +172,16 @@ class PasswordsListFragment : Fragment() {
                                     viewModel.selectedPasswordsMMap[index] = passwordInfo
                                 }
                             }
-                            if (this@PasswordsListFragment::adapter.isInitialized) {
+                            if (this@RecycleBinFragment::adapter.isInitialized) {
                                 adapter.notifyDataSetChanged()
-                            }
-                        }
-                }
-                launch {
-                    viewModel.passwordsListFlow
-                        .collect { passwordsList ->
-                            if (passwordsList != null) {
-                                viewModel.passwordsList.clear()
-                                viewModel.passwordsList.addAll(passwordsList)
-                                setRecyclerView(passwordsList)
                             }
                         }
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "RecycleBinFragment"
     }
 }

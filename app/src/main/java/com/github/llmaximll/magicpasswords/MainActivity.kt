@@ -18,14 +18,20 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigator
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.NavHostFragment
-import com.github.llmaximll.magicpasswords.changepassword.ChangePasswordFragment
+import com.github.llmaximll.magicpasswords.ui.changepassword.ChangePasswordFragment
 import com.github.llmaximll.magicpasswords.databinding.ActivityMainBinding
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
-import com.github.llmaximll.magicpasswords.passwords.PasswordsListFragment
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
+import com.github.llmaximll.magicpasswords.ui.passwords.PasswordsListFragment
 import com.github.llmaximll.magicpasswords.states.BottomBarAndFabState
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
-import com.github.llmaximll.magicpasswords.utils.StorageUtils
+import com.github.llmaximll.magicpasswords.ui.binpasswords.RecycleBinFragment
+import com.github.llmaximll.magicpasswords.ui.nav.BottomNavDrawerFragment
+import com.github.llmaximll.magicpasswords.ui.settings.SettingsFragment
+import com.github.llmaximll.magicpasswords.utils.Animation
+import com.github.llmaximll.magicpasswords.utils.Common
+import com.github.llmaximll.magicpasswords.utils.Encryption
+import com.github.llmaximll.magicpasswords.utils.Storage
 import com.google.android.material.transition.platform.MaterialElevationScale
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
 import com.google.gson.JsonSyntaxException
@@ -49,8 +55,8 @@ class MainActivity : AppCompatActivity(),
     lateinit var openDocumentIntent: Intent
     lateinit var openDocumentResultLauncher: ActivityResultLauncher<Intent>
 
-    private var currentNavigationFragment: Fragment? =
-        supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+    private val currentNavigationFragment: Fragment?
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.childFragmentManager
             ?.fragments
             ?.first()
@@ -58,9 +64,9 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        viewModel = CommonFunctions.initViewModel(this, MainActivityVM::class.java) as MainActivityVM
-        val sp = CommonFunctions.getSharedPreferences(this)
-        when (sp.getInt(CommonFunctions.spThemeApp, 0)) {
+        viewModel = Common.initViewModel(this, MainActivityVM::class.java) as MainActivityVM
+        val sp = Common.getSharedPreferences(this)
+        when (sp.getInt(Common.spThemeApp, 0)) {
             0 -> setTheme(R.style.Theme_MagicPasswords)
             1 -> setTheme(R.style.Theme_MagicPasswordsDay)
             2 -> setTheme(R.style.Theme_MagicPasswordsNight)
@@ -86,7 +92,7 @@ class MainActivity : AppCompatActivity(),
                     lifecycleScope.launch(Dispatchers.IO) {
                         val text = viewModel.getAllPasswords()
                         val gson = GsonBuilder().create()
-                        val file = if (sp.getBoolean(CommonFunctions.spBackupEncryption, true)) {
+                        val file = if (sp.getBoolean(Common.spBackupEncryption, true)) {
                             Encryption.encrypt(gson.toJson(text), this@MainActivity)
                         } else {
                             gson.toJson(text)
@@ -95,7 +101,7 @@ class MainActivity : AppCompatActivity(),
                             result.data.also { intent ->
                                 if (intent != null) {
                                     val path = "/storage/emulated/0/${intent.data?.path?.drop(18)}"
-                                    StorageUtils.setTextInStorage(
+                                    Storage.setTextInStorage(
                                         rootDestination = File(path),
                                         fileName = null,
                                         folderName = null,
@@ -104,7 +110,7 @@ class MainActivity : AppCompatActivity(),
                                 }
                             }
                         } else {
-                            CommonFunctions.toast(
+                            Common.toast(
                                 this@MainActivity,
                                 "Ошибка при создании резервной копии"
                             )
@@ -123,7 +129,7 @@ class MainActivity : AppCompatActivity(),
                     result.data.also { intent ->
                         if (intent != null) {
                             val file =
-                                StorageUtils.getTextFromStorage(
+                                Storage.getTextFromStorage(
                                     rootDestination = File(
                                         "/storage/emulated/0/${intent.data?.path?.drop(18)}"),
                                     fileName = null,
@@ -155,11 +161,21 @@ class MainActivity : AppCompatActivity(),
             addPasswordFab.setOnTouchListener { v, event ->
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        CommonFunctions.animateView(v, reverse = false, zChange = false, .8f)
+                        Animation.animateView(v, reverse = false, zChange = false, .8f)
                     }
                     MotionEvent.ACTION_UP -> {
-                        CommonFunctions.animateView(v, reverse = true, zChange = false, .8f)
-                        navController.navigate(R.id.action_passwordsListFragment_to_addPasswordFragment)
+                        Animation.animateView(v, reverse = true, zChange = false, .8f)
+                        currentNavigationFragment?.apply {
+                            exitTransition = MaterialElevationScale(false).apply {
+                                duration = resources.getInteger(
+                                    R.integer.material_motion_duration_medium_1).toLong()
+                            }
+                            reenterTransition = MaterialElevationScale(true).apply {
+                                duration = resources.getInteger(
+                                    R.integer.material_motion_duration_medium_1).toLong()
+                            }
+                        }
+                        navController.navigate(R.id.addPasswordFragment)
                         v.performClick()
                     }
                 }
@@ -177,36 +193,27 @@ class MainActivity : AppCompatActivity(),
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.changePasswordFragment -> {
-                    binding.run {
-                        viewModel.bottomBarAndFabStateDataFlow.value =
-                            BottomBarAndFabState.BottomBarOffFabOff
-                    }
+                    viewModel.bottomBarAndFabStateDataFlow.value =
+                        BottomBarAndFabState.BottomBarOffFabOff
                 }
                 R.id.addPasswordFragment -> {
-                    currentNavigationFragment?.apply {
-                        exitTransition = MaterialElevationScale(false).apply {
-                            duration = resources.getInteger(android.R.integer.config_longAnimTime).toLong()
-                        }
-                        reenterTransition = MaterialElevationScale(true).apply {
-                            duration = resources.getInteger(android.R.integer.config_longAnimTime).toLong()
-                        }
-                    }
-                    binding.run {
-                        viewModel.bottomBarAndFabStateDataFlow.value =
-                            BottomBarAndFabState.BottomBarOffFabOff
-                    }
+                    viewModel.bottomBarAndFabStateDataFlow.value =
+                        BottomBarAndFabState.BottomBarOffFabOff
                 }
                 R.id.passwordsListFragment -> {
                     viewModel.bottomBarAndFabStateDataFlow.value =
                             BottomBarAndFabState.BottomBarOnFabOn
+                    binding.bottomAppBarTitle.text = "Все"
                 }
                 R.id.settingsFragment -> {
                     viewModel.bottomBarAndFabStateDataFlow.value =
                         BottomBarAndFabState.BottomBarOnFabOff
+                    binding.bottomAppBarTitle.text = "Настройки"
                 }
                 R.id.recycleBinFragment -> {
                     viewModel.bottomBarAndFabStateDataFlow.value =
                         BottomBarAndFabState.BottomBarOnFabOff
+                    binding.bottomAppBarTitle.text = "Корзина"
                 }
             }
         }
@@ -222,7 +229,7 @@ class MainActivity : AppCompatActivity(),
         binding.bottomAppBar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.search -> {
-                    CommonFunctions.toast(this@MainActivity, "search")
+                    Common.toast(this@MainActivity, "search")
                 }
             }
             true
@@ -276,70 +283,25 @@ class MainActivity : AppCompatActivity(),
                         .collect { state ->
                             if (state) {
                                 binding.run {
-                                    clickableImageView.apply {
-                                        animate().apply {
-                                            alpha(1f)
-                                            withStartAction {
-                                                isVisible = true
-                                                isClickable = true
-                                                isFocusable = true
-                                            }
-                                        }
-                                    }
-                                    bottomNavDrawer.apply {
-                                        animate().apply {
-                                            translationY(-150f)
-                                            alpha(1f)
-                                            withStartAction {
-                                                isVisible = true
-                                            }
-                                        }
-                                    }
-                                    bottomAppBarChevron.animate().apply {
-                                        rotation(180f)
-                                        viewModel.bottomBarMenuDataFlow.value = true
-                                    }
-                                    bottomAppBarTitle.animate().apply {
-                                        alpha(0f)
-                                    }
-                                    if (currentNavigationFragment is PasswordsListFragment) {
-                                        viewModel.bottomBarAndFabStateDataFlow.value =
-                                            BottomBarAndFabState.BottomBarOnFabOff
-                                    }
+                                    Animation.animateMainMenu(
+                                        viewModel,
+                                        reverse = false,
+                                        clickableImageView = clickableImageView,
+                                        bottomNavFragment = bottomNavDrawer,
+                                        bottomAppBarChevron = bottomAppBarChevron,
+                                        bottomAppBarTitle = bottomAppBarTitle
+                                    )
                                 }
                             } else {
                                 binding.run {
-                                    clickableImageView.apply {
-                                        animate().apply {
-                                            alpha(0f)
-                                            withEndAction {
-                                                isVisible = false
-                                                isClickable = false
-                                                isFocusable = false
-                                            }
-                                        }
-                                    }
-                                    bottomNavDrawer.apply {
-                                        animate().apply {
-                                            translationY(100f)
-                                            alpha(0f)
-                                            withEndAction {
-                                                isVisible = false
-                                            }
-                                        }
-                                    }
-                                    bottomAppBarChevron.animate().apply {
-                                        rotation(0f)
-                                        viewModel.bottomBarMenuDataFlow.value = false
-                                    }
-                                    bottomAppBarTitle.animate().apply {
-                                        alpha(1f)
-                                    }
-                                    if (currentNavigationFragment is PasswordsListFragment) {
-                                        viewModel.bottomBarAndFabStateDataFlow.value =
-                                            BottomBarAndFabState.BottomBarOnFabOn
-                                        CommonFunctions.toast(this@MainActivity, "PasswordsListFragment")
-                                    }
+                                    Animation.animateMainMenu(
+                                        viewModel,
+                                        reverse = true,
+                                        clickableImageView = clickableImageView,
+                                        bottomNavFragment = bottomNavDrawer,
+                                        bottomAppBarChevron = bottomAppBarChevron,
+                                        bottomAppBarTitle = bottomAppBarTitle
+                                    )
                                 }
                             }
                         }
@@ -369,7 +331,7 @@ class MainActivity : AppCompatActivity(),
             transitionView, transitionView.transitionName
         ).build()
         navController.navigate(
-            R.id.action_passwordsListFragment_to_changePasswordFragment,
+            R.id.changePasswordFragment,
             args,
             null,
             extras
@@ -403,19 +365,40 @@ class MainActivity : AppCompatActivity(),
     override fun onMenuItemClicked(button: Int) {
         when (button) {
             BottomNavDrawerFragment.PASSWORDS_ITEM -> {
-                binding.bottomAppBarTitle.text = "Все"
+                currentNavigationFragment?.apply {
+                    exitTransition = MaterialFadeThrough().apply {
+                        duration = resources.getInteger(
+                            R.integer.material_motion_duration_medium_1).toLong()
+                    }
+                }
                 viewModel.bottomBarMenuDataFlow.value = false
-                navController.navigate(R.id.passwordsListFragment)
+                if (currentNavigationFragment !is PasswordsListFragment) {
+                    navController.navigate(R.id.action_global_passwordsListFragment)
+                }
             }
             BottomNavDrawerFragment.SETTINGS_ITEM -> {
-                binding.bottomAppBarTitle.text = "Настройки"
+                currentNavigationFragment?.apply {
+                    exitTransition = MaterialFadeThrough().apply {
+                        duration = resources.getInteger(
+                            R.integer.material_motion_duration_medium_1).toLong()
+                    }
+                }
                 viewModel.bottomBarMenuDataFlow.value = false
-                navController.navigate(R.id.settingsFragment)
+                if (currentNavigationFragment !is SettingsFragment) {
+                    navController.navigate(R.id.action_global_settingsFragment)
+                }
             }
             BottomNavDrawerFragment.RECYCLE_BIN_ITEM -> {
-                binding.bottomAppBarTitle.text = "Корзина"
+                currentNavigationFragment?.apply {
+                    exitTransition = MaterialFadeThrough().apply {
+                        duration = resources.getInteger(
+                            R.integer.material_motion_duration_medium_1).toLong()
+                    }
+                }
                 viewModel.bottomBarMenuDataFlow.value = false
-                navController.navigate(R.id.recycleBinFragment)
+                if (currentNavigationFragment !is RecycleBinFragment) {
+                    navController.navigate(R.id.action_global_recycleBinFragment)
+                }
             }
         }
     }

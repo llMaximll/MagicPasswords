@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MagicPasswords">
         <activity
-            android:name=".login.LoginActivity"
+            android:name="com.github.llmaximll.magicpasswords.ui.login.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">

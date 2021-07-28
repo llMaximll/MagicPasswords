@@ -1,11 +1,11 @@
-package com.github.llmaximll.magicpasswords.binpasswords
+package com.github.llmaximll.magicpasswords.ui.binpasswords
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.states.ListState
 
 class RemovedPasswordsListAdapter(

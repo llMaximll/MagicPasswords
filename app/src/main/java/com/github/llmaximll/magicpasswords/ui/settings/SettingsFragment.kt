@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.settings
+package com.github.llmaximll.magicpasswords.ui.settings
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -13,7 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import com.github.llmaximll.magicpasswords.R
 import com.github.llmaximll.magicpasswords.MainActivity
 import com.github.llmaximll.magicpasswords.databinding.FragmentSettingsBinding
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.Common
+import com.google.android.material.transition.platform.MaterialFadeThrough
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -30,8 +31,8 @@ class SettingsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        sp = CommonFunctions.getSharedPreferences(requireContext())
-        fingerprint = sp.getBoolean(CommonFunctions.spFingerPrint, false)
+        sp = Common.getSharedPreferences(requireContext())
+        fingerprint = sp.getBoolean(Common.spFingerPrint, false)
     }
 
     override fun onCreateView(
@@ -48,7 +49,7 @@ class SettingsFragment : Fragment() {
         if (fingerprint) {
             binding.fingerprintSwitch.isChecked = true
         }
-        viewModel = CommonFunctions.initViewModel(this, SettingsVM::class.java) as SettingsVM
+        viewModel = Common.initViewModel(this, SettingsVM::class.java) as SettingsVM
         viewModel.initSharedPreferences(requireContext())
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -74,6 +75,10 @@ class SettingsFragment : Fragment() {
                     }
                 }
         }
+        // Transition
+        enterTransition = MaterialFadeThrough().apply {
+            duration = resources.getInteger(R.integer.material_motion_duration_medium_1).toLong()
+        }
     }
 
     override fun onStart() {
@@ -84,14 +89,14 @@ class SettingsFragment : Fragment() {
                     showFingerprint()
                 } else {
                     val editor = sp.edit()
-                    editor.putBoolean(CommonFunctions.spFingerPrint, false)
+                    editor.putBoolean(Common.spFingerPrint, false)
                     editor.apply()
 
-                    CommonFunctions.toast(requireContext(), "Отозван")
+                    Common.toast(requireContext(), "Отозван")
                 }
             } else {
                 binding.fingerprintSwitch.isChecked = false
-                CommonFunctions.toast(requireContext(), "Биометрическая аутентификация не поддерживается")
+                Common.toast(requireContext(), "Биометрическая аутентификация не поддерживается")
             }
         }
         binding.fingerprintButton.setOnClickListener {
@@ -123,17 +128,17 @@ class SettingsFragment : Fragment() {
                         super.onAuthenticationSucceeded(result)
 
                         val editor = sp.edit()
-                        editor.putBoolean(CommonFunctions.spFingerPrint, true)
+                        editor.putBoolean(Common.spFingerPrint, true)
                         editor.apply()
                         binding.fingerprintSwitch.isChecked = true
 
-                        CommonFunctions.toast(requireContext(),  "Успешно")
+                        Common.toast(requireContext(),  "Успешно")
                     }
 
                     override fun onAuthenticationFailed() {
                         super.onAuthenticationFailed()
                         binding.fingerprintSwitch.isChecked = false
-                        CommonFunctions.toast(requireContext(), "Попытка не удалась")
+                        Common.toast(requireContext(), "Попытка не удалась")
                     }
 
                     override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {

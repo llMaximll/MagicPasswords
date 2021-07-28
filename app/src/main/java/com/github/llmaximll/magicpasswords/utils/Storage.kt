@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import java.io.File
 import java.io.IOException
 
-object StorageUtils {
+object Storage {
     private fun createOrGetFile(
         destination: File,
         fileName: String,

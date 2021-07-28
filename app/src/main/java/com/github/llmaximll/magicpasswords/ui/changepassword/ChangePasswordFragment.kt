@@ -1,4 +1,4 @@
-package com.github.llmaximll.magicpasswords.changepassword
+package com.github.llmaximll.magicpasswords.ui.changepassword
 
 import android.graphics.Color
 import android.os.Bundle
@@ -11,11 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.github.llmaximll.magicpasswords.Encryption
+import com.github.llmaximll.magicpasswords.utils.Encryption
 import com.github.llmaximll.magicpasswords.R
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.databinding.FragmentChangePasswordBinding
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.Common
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -42,7 +42,7 @@ class ChangePasswordFragment : Fragment() {
         idPassword = try {
             UUID.fromString(arguments?.getString(ARG_ID_PASSWORD))
         } catch (e: Exception) {
-            CommonFunctions.toast(requireContext(), "Ошибка загрузки пароля")
+            Common.toast(requireContext(), "Ошибка загрузки пароля")
             requireActivity().onBackPressed()
             UUID.randomUUID()
         }
@@ -162,7 +162,7 @@ class ChangePasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = CommonFunctions.initViewModel(this, ChangePasswordVM::class.java) as ChangePasswordVM
+        viewModel = Common.initViewModel(this, ChangePasswordVM::class.java) as ChangePasswordVM
         if (this::idPassword.isInitialized) {
             restorePassword()
         }

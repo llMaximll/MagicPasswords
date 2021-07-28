@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:visibility="gone"
-        android:name="com.github.llmaximll.magicpasswords.BottomNavDrawerFragment"/>
+        android:name="com.github.llmaximll.magicpasswords.ui.nav.BottomNavDrawerFragment"/>
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"

@@ -7,35 +7,37 @@
 
     <fragment
         android:id="@+id/passwordsListFragment"
-        android:name="com.github.llmaximll.magicpasswords.passwords.PasswordsListFragment"
+        android:name="com.github.llmaximll.magicpasswords.ui.passwords.PasswordsListFragment"
         android:label="PasswordsListFragment" >
-        <action
-            android:id="@+id/action_passwordsListFragment_to_recycleBinFragment"
-            app:destination="@id/recycleBinFragment" />
-        <action
-            android:id="@+id/action_passwordsListFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
-        <action
-            android:id="@+id/action_passwordsListFragment_to_addPasswordFragment"
-            app:destination="@id/addPasswordFragment" />
-        <action
-            android:id="@+id/action_passwordsListFragment_to_changePasswordFragment"
-            app:destination="@id/changePasswordFragment" />
     </fragment>
     <fragment
         android:id="@+id/recycleBinFragment"
-        android:name="com.github.llmaximll.magicpasswords.binpasswords.RecycleBinFragment"
+        android:name="com.github.llmaximll.magicpasswords.ui.binpasswords.RecycleBinFragment"
         android:label="RecycleBinFragment" />
     <fragment
         android:id="@+id/changePasswordFragment"
-        android:name="com.github.llmaximll.magicpasswords.changepassword.ChangePasswordFragment"
+        android:name="com.github.llmaximll.magicpasswords.ui.changepassword.ChangePasswordFragment"
         android:label="ChangePasswordFragment" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.github.llmaximll.magicpasswords.settings.SettingsFragment"
+        android:name="com.github.llmaximll.magicpasswords.ui.settings.SettingsFragment"
         android:label="SettingsFragment" />
     <fragment
         android:id="@+id/addPasswordFragment"
-        android:name="com.github.llmaximll.magicpasswords.addpassword.AddPasswordFragment"
+        android:name="com.github.llmaximll.magicpasswords.ui.addpassword.AddPasswordFragment"
         android:label="AddPasswordFragment" />
+    <action
+        android:id="@+id/action_global_settingsFragment"
+        app:destination="@id/settingsFragment"
+        app:popUpTo="@id/passwordsListFragment" />
+    <action
+        android:id="@+id/action_global_recycleBinFragment"
+        app:destination="@id/recycleBinFragment"
+        app:popUpTo="@id/passwordsListFragment" />
+    <action
+        android:id="@+id/action_global_passwordsListFragment"
+        app:destination="@id/passwordsListFragment"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/passwordsListFragment"
+        app:popUpToInclusive="true" />
 </navigation>

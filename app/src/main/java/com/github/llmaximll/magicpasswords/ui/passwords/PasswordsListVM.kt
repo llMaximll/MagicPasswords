@@ -1,14 +1,14 @@
-package com.github.llmaximll.magicpasswords.passwords
+package com.github.llmaximll.magicpasswords.ui.passwords
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.llmaximll.magicpasswords.model.PasswordInfo
+import com.github.llmaximll.magicpasswords.data.PasswordInfo
 import com.github.llmaximll.magicpasswords.repositories.MagicRepository
 import com.github.llmaximll.magicpasswords.states.ListState
-import com.github.llmaximll.magicpasswords.utils.CommonFunctions
+import com.github.llmaximll.magicpasswords.utils.Common
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,9 +39,9 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
 
     fun deletePasswords(mMap: MutableMap<Int, PasswordInfo>, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            val sp = CommonFunctions.getSharedPreferences(context)
-            val deleteFormat = sp.getInt(CommonFunctions.spTimeDelete, CommonFunctions.TimeDeleteMonthSP)
-            if (deleteFormat != CommonFunctions.TimeDeleteImmediatelySP) {
+            val sp = Common.getSharedPreferences(context)
+            val deleteFormat = sp.getInt(Common.spTimeDelete, Common.TimeDeleteMonthSP)
+            if (deleteFormat != Common.TimeDeleteImmediatelySP) {
                 for (i in mMap.values) {
                     i.apply {
                         removed = 1
@@ -51,11 +51,11 @@ class PasswordsListVM(state: SavedStateHandle) : ViewModel() {
                 }
                 val count = repository.updateAllPasswords(mMap.values.toList())
                 withContext(Dispatchers.Main) {
-                    if (sp.getInt(CommonFunctions.spTimeDelete, CommonFunctions.TimeDeleteMonthSP) !=
-                        CommonFunctions.TimeDeleteImmediatelySP) {
-                        CommonFunctions.toast(context, "Добавлено в корзину: $count")
+                    if (sp.getInt(Common.spTimeDelete, Common.TimeDeleteMonthSP) !=
+                        Common.TimeDeleteImmediatelySP) {
+                        Common.toast(context, "Добавлено в корзину: $count")
                     } else {
-                        CommonFunctions.toast(context, "Удалено: $count")
+                        Common.toast(context, "Удалено: $count")
                     }
                 }
             } else {
